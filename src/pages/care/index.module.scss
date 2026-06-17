@@ -436,3 +436,239 @@
   background: linear-gradient(135deg, $color-primary 0%, $color-primary-light 100%);
   color: $color-text-white;
 }
+
+// 宠物筛选条
+.petFilterSection {
+  margin-bottom: $spacing-lg;
+}
+
+.petFilterScroll {
+  width: 100%;
+  white-space: nowrap;
+}
+
+.petFilterList {
+  display: inline-flex;
+  gap: $spacing-md;
+  padding: $spacing-sm 0;
+}
+
+.petFilterItem {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: $spacing-xs;
+  flex-shrink: 0;
+}
+
+.petFilterAvatarWrap {
+  width: 96rpx;
+  height: 96rpx;
+  border-radius: $radius-round;
+  background-color: $color-bg-card;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 3rpx solid transparent;
+  transition: all $transition-fast;
+}
+
+.petFilterItemActive .petFilterAvatarWrap {
+  border-color: $color-primary;
+  box-shadow: 0 0 0 4rpx rgba(255, 140, 66, 0.15);
+}
+
+.petFilterAvatar {
+  width: 100%;
+  height: 100%;
+  border-radius: $radius-round;
+}
+
+.petFilterAllIcon {
+  font-size: 36rpx;
+}
+
+.petFilterName {
+  font-size: $font-size-xs;
+  color: $color-text-secondary;
+  max-width: 96rpx;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.petFilterItemActive .petFilterName {
+  color: $color-primary;
+  font-weight: $font-weight-medium;
+}
+
+// 相册日期分组
+.dateGroup {
+  margin-bottom: $spacing-lg;
+  background-color: $color-bg-card;
+  border-radius: $radius-lg;
+  overflow: hidden;
+  box-shadow: $shadow-card;
+}
+
+.dateGroupHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: $spacing-md $spacing-lg;
+  cursor: pointer;
+  transition: background-color $transition-fast;
+
+  &:active {
+    background-color: $color-bg-hover;
+  }
+}
+
+.dateGroupTitle {
+  display: flex;
+  align-items: center;
+  gap: $spacing-sm;
+}
+
+.dateGroupDate {
+  font-size: $font-size-md;
+  font-weight: $font-weight-semibold;
+  color: $color-text-primary;
+}
+
+.dateGroupCount {
+  font-size: $font-size-xs;
+  color: $color-text-tertiary;
+  background-color: $color-bg-tag;
+  padding: 4rpx 12rpx;
+  border-radius: $radius-xs;
+}
+
+.dateGroupArrow {
+  font-size: 20rpx;
+  color: $color-text-tertiary;
+  transition: transform $transition-fast;
+}
+
+.dateGroupArrowExpanded {
+  transform: rotate(180deg);
+}
+
+.dateGroupPreview {
+  display: flex;
+  gap: 4rpx;
+  padding: 0 $spacing-lg $spacing-lg;
+}
+
+.dateGroupPreviewImg {
+  flex: 1;
+  height: 160rpx;
+  border-radius: $radius-sm;
+}
+
+.dateGroupContent {
+  padding: 0 $spacing-lg $spacing-lg;
+}
+
+.dateTimeline {
+  position: relative;
+  padding-left: 80rpx;
+}
+
+.dateTimeline::before {
+  content: '';
+  position: absolute;
+  left: 52rpx;
+  top: 10rpx;
+  bottom: 10rpx;
+  width: 2rpx;
+  background-color: $color-border;
+}
+
+.dateTimelineItem {
+  position: relative;
+  padding-bottom: $spacing-md;
+
+  &:last-child {
+    padding-bottom: 0;
+  }
+}
+
+.dateTimelineItem::before {
+  content: '';
+  position: absolute;
+  left: -36rpx;
+  top: 28rpx;
+  width: 16rpx;
+  height: 16rpx;
+  border-radius: $radius-round;
+  background-color: $color-primary;
+  border: 3rpx solid $color-bg-card;
+  z-index: 1;
+}
+
+.dateTimelineTime {
+  position: absolute;
+  left: -80rpx;
+  top: 20rpx;
+  width: 60rpx;
+  font-size: 20rpx;
+  color: $color-text-tertiary;
+  text-align: right;
+}
+
+.dateTimelineCard {
+  background-color: $color-bg-page;
+  border-radius: $radius-md;
+  padding: $spacing-sm;
+  margin-top: $spacing-sm;
+}
+
+.dateTimelineTitle {
+  font-size: $font-size-sm;
+  font-weight: $font-weight-medium;
+  color: $color-text-primary;
+  margin-bottom: $spacing-sm;
+}
+
+.galleryGrid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8rpx;
+}
+
+.galleryItem {
+  position: relative;
+  aspect-ratio: 1;
+  border-radius: $radius-sm;
+  overflow: hidden;
+}
+
+.galleryImg {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.galleryPlayBtn {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 60rpx;
+  height: 60rpx;
+  background-color: rgba(0, 0, 0, 0.5);
+  border-radius: $radius-round;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: $color-text-white;
+  font-size: 24rpx;
+}
+
+// 覆盖原相册网格样式
+.photoGallery {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-md;
+}

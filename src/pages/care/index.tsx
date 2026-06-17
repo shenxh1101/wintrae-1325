@@ -8,6 +8,7 @@ import Empty from '@/components/Empty';
 import { careLogs as mockLogs, careTodos, careSummary } from '@/data/care-logs';
 import { orders as mockOrders } from '@/data/orders';
 import type { CareLog, CareTodo } from '@/types/care';
+import { usePetStore } from '@/store/usePetStore';
 import dayjs from 'dayjs';
 
 type LogTab = 'all' | 'today' | 'abnormal' | 'photo';
@@ -19,30 +20,75 @@ const logTabs = [
   { key: 'abnormal', label: '⚠️ 异常' }
 ];
 
+const getLogPetIds = (log: CareLog): string[] => {
+  if ((log as any).petIds && Array.isArray((log as any).petIds)) {
+    return (log as any).petIds;
+  }
+  return log.petId ? [log.petId] : [];
+};
+
 const CarePage: React.FC = () => {
   const [activeTab, setActiveTab] = useState<LogTab>('all');
   const [todos, setTodos] = useState<CareTodo[]>(careTodos);
   const [careLogs] = useState<CareLog[]>(mockLogs);
+  const [selectedPetId, setSelectedPetId] = useState<string | null>(null);
+  const [expandedDates, setExpandedDates] = useState<Set<string>>(new Set());
+  const { pets } = usePetStore();
 
   const currentOrder = useMemo(() => {
     return mockOrders.find((o) => o.status === 'care' || o.status === 'checkin');
   }, []);
 
   const filteredLogs = useMemo(() => {
+    let logs = careLogs;
+
+    if (selectedPetId) {
+      logs = logs.filter((l) => getLogPetIds(l).includes(selectedPetId));
+    }
+
     switch (activeTab) {
       case 'today':
-        return careLogs.filter((l) =>
+        logs = logs.filter((l) =>
           dayjs(l.timestamp).isSame(dayjs(), 'day') ||
           dayjs(l.timestamp).isSame(dayjs('2026-06-18'), 'day')
         );
+        break;
       case 'photo':
-        return careLogs.filter((l) => l.medias && l.medias.length > 0);
+        logs = logs.filter((l) => l.medias && l.medias.length > 0);
+        break;
       case 'abnormal':
-        return careLogs.filter((l) => l.type === 'abnormal');
+        logs = logs.filter((l) => l.type === 'abnormal');
+        break;
       default:
-        return careLogs;
+        break;
     }
-  }, [activeTab, careLogs]);
+
+    return logs;
+  }, [activeTab, careLogs, selectedPetId]);
+
+  const photoLogsByDate = useMemo(() => {
+    const groups: Record<string, CareLog[]> = {};
+    filteredLogs.forEach((log) => {
+      const date = dayjs(log.timestamp).format('YYYY-MM-DD');
+      if (!groups[date]) {
+        groups[date] = [];
+      }
+      groups[date].push(log);
+    });
+    return Object.entries(groups).sort((a, b) => b[0].localeCompare(a[0]));
+  }, [filteredLogs]);
+
+  const toggleDateExpand = (date: string) => {
+    setExpandedDates((prev) => {
+      const next = new Set(prev);
+      if (next.has(date)) {
+        next.delete(date);
+      } else {
+        next.add(date);
+      }
+      return next;
+    });
+  };
 
   const abnormalLogs = useMemo(
     () => careLogs.filter((l) => l.type === 'abnormal'),
@@ -236,6 +282,45 @@ const CarePage: React.FC = () => {
           </View>
         </View>
 
+        {/* 宠物筛选条 */}
+        <View className={styles.petFilterSection}>
+          <ScrollView className={styles.petFilterScroll} scrollX showScrollbar={false}>
+            <View className={styles.petFilterList}>
+              <View
+                className={classnames(
+                  styles.petFilterItem,
+                  selectedPetId === null && styles.petFilterItemActive
+                )}
+                onClick={() => setSelectedPetId(null)}
+              >
+                <View className={styles.petFilterAvatarWrap}>
+                  <Text className={styles.petFilterAllIcon}>🐾</Text>
+                </View>
+                <Text className={styles.petFilterName}>全部</Text>
+              </View>
+              {pets.map((pet) => (
+                <View
+                  key={pet.id}
+                  className={classnames(
+                    styles.petFilterItem,
+                    selectedPetId === pet.id && styles.petFilterItemActive
+                  )}
+                  onClick={() => setSelectedPetId(pet.id)}
+                >
+                  <View className={styles.petFilterAvatarWrap}>
+                    <Image
+                      className={styles.petFilterAvatar}
+                      src={pet.avatar}
+                      mode="aspectFill"
+                    />
+                  </View>
+                  <Text className={styles.petFilterName}>{pet.name}</Text>
+                </View>
+              ))}
+            </View>
+          </ScrollView>
+        </View>
+
         {/* 日志Tab切换 */}
         <View className={styles.sectionHeader}>
           <View className={styles.sectionTitle}>
@@ -256,64 +341,124 @@ const CarePage: React.FC = () => {
           ))}
         </View>
 
-        {/* 相册视图 */}
-        {activeTab === 'photo' && filteredLogs.length > 0 ? (
-          <View className={styles.photoGallery}>
-            {filteredLogs.flatMap((log) =>
-              log.medias.map((media) => (
-                <View
-                  key={`${log.id}-${media.id}`}
-                  className={styles.galleryItem}
-                  onClick={() => {
-                    if (media.type === 'image') {
-                      const imageUrls = log.medias
-                        .filter((m) => m.type === 'image')
-                        .map((m) => m.url);
-                      const currentIndex = log.medias
-                        .filter((m) => m.type === 'image')
-                        .findIndex((m) => m.id === media.id);
-                      Taro.previewImage({
-                        current: currentIndex >= 0 ? currentIndex : 0,
-                        urls: imageUrls
-                      });
-                    } else if (media.type === 'video') {
-                      Taro.previewMedia({
-                        sources: [
-                          {
-                            url: media.url,
-                            type: 'video',
-                            poster: (media as any).poster || ''
-                          }
-                        ]
-                      });
-                    }
-                  }}
-                >
-                  <Image
-                    className={styles.galleryImg}
-                    src={media.type === 'video' ? (media as any).poster || media.url : media.url}
-                    mode="aspectFill"
-                  />
-                  {media.type === 'video' && (
-                    <View className={styles.galleryPlayBtn}>
-                      <Text>▶</Text>
-                    </View>
-                  )}
-                  <View className={styles.galleryInfo}>
-                    <Text className={styles.galleryTime}>
-                      {dayjs(log.timestamp).format('HH:mm')}
-                    </Text>
-                  </View>
-                </View>
-              ))
-            )}
-          </View>
-        ) : filteredLogs.length === 0 ? (
+        {/* 内容区域 */}
+        {filteredLogs.length === 0 ? (
           <Empty
             icon="📝"
             title="暂无日志记录"
             desc="今天的照护记录将在这里显示"
           />
+        ) : activeTab === 'photo' ? (
+          <View className={styles.photoGallery}>
+            {photoLogsByDate.map(([date, logs]) => {
+              const isExpanded = expandedDates.has(date);
+              const mediaCount = logs.reduce((sum, log) => sum + log.medias.length, 0);
+              return (
+                <View key={date} className={styles.dateGroup}>
+                  <View
+                    className={styles.dateGroupHeader}
+                    onClick={() => toggleDateExpand(date)}
+                  >
+                    <View className={styles.dateGroupTitle}>
+                      <Text className={styles.dateGroupDate}>
+                        {dayjs(date).format('YYYY年MM月DD日')}
+                      </Text>
+                      <Text className={styles.dateGroupCount}>{mediaCount}张</Text>
+                    </View>
+                    <Text
+                      className={classnames(
+                        styles.dateGroupArrow,
+                        isExpanded && styles.dateGroupArrowExpanded
+                      )}
+                    >
+                      ▼
+                    </Text>
+                  </View>
+                  {isExpanded && (
+                    <View className={styles.dateGroupContent}>
+                      <View className={styles.dateTimeline}>
+                        {logs.map((log) => (
+                          <View key={log.id} className={styles.dateTimelineItem}>
+                            <View className={styles.dateTimelineTime}>
+                              {dayjs(log.timestamp).format('HH:mm')}
+                            </View>
+                            <View className={styles.dateTimelineCard}>
+                              <Text className={styles.dateTimelineTitle}>{log.title}</Text>
+                              <View className={styles.galleryGrid}>
+                                {log.medias.map((media) => (
+                                  <View
+                                    key={media.id}
+                                    className={styles.galleryItem}
+                                    onClick={() => {
+                                      if (media.type === 'image') {
+                                        const imageUrls = log.medias
+                                          .filter((m) => m.type === 'image')
+                                          .map((m) => m.url);
+                                        const currentIndex = log.medias
+                                          .filter((m) => m.type === 'image')
+                                          .findIndex((m) => m.id === media.id);
+                                        Taro.previewImage({
+                                          current: currentIndex >= 0 ? currentIndex : 0,
+                                          urls: imageUrls
+                                        });
+                                      } else if (media.type === 'video') {
+                                        Taro.previewMedia({
+                                          sources: [
+                                            {
+                                              url: media.url,
+                                              type: 'video',
+                                              poster: (media as any).poster || ''
+                                            }
+                                          ]
+                                        });
+                                      }
+                                    }}
+                                  >
+                                    <Image
+                                      className={styles.galleryImg}
+                                      src={
+                                        media.type === 'video'
+                                          ? (media as any).poster || media.url
+                                          : media.url
+                                      }
+                                      mode="aspectFill"
+                                    />
+                                    {media.type === 'video' && (
+                                      <View className={styles.galleryPlayBtn}>
+                                        <Text>▶</Text>
+                                      </View>
+                                    )}
+                                  </View>
+                                ))}
+                              </View>
+                            </View>
+                          </View>
+                        ))}
+                      </View>
+                    </View>
+                  )}
+                  {!isExpanded && (
+                    <View className={styles.dateGroupPreview}>
+                      {logs.flatMap((log) =>
+                        log.medias.slice(0, 3).map((media) => (
+                          <Image
+                            key={`${log.id}-${media.id}`}
+                            className={styles.dateGroupPreviewImg}
+                            src={
+                              media.type === 'video'
+                                ? (media as any).poster || media.url
+                                : media.url
+                            }
+                            mode="aspectFill"
+                          />
+                        ))
+                      )}
+                    </View>
+                  )}
+                </View>
+              );
+            })}
+          </View>
         ) : (
           <View className={styles.timeline}>
             {filteredLogs.map((log) => (

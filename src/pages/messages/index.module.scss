@@ -403,3 +403,129 @@
   background: linear-gradient(135deg, $color-primary 0%, $color-primary-light 100%);
   color: $color-text-white;
 }
+
+// 顶部导航栏
+.header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 88rpx;
+  background-color: #fff;
+  border-bottom: 2rpx solid #f0f0f0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 100;
+}
+
+.headerTitle {
+  font-size: 32rpx;
+  font-weight: $font-weight-bold;
+  color: $color-text-primary;
+}
+
+.headerActions {
+  position: absolute;
+  right: $page-padding;
+  display: flex;
+  align-items: center;
+  gap: $spacing-md;
+}
+
+.headerAction {
+  font-size: 28rpx;
+  color: #ff6b35;
+}
+
+// 滚动容器
+.scrollContainer {
+  padding-top: 88rpx;
+  min-height: 100vh;
+  box-sizing: border-box;
+}
+
+// 底部安全距离
+.bottomSpace {
+  height: 120rpx;
+}
+
+// 选择模式全选栏
+.selectBar {
+  padding: 20rpx $page-padding;
+  background-color: #f9f9f9;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.selectAll {
+  display: flex;
+  align-items: center;
+  gap: 12rpx;
+}
+
+.selectCheckbox {
+  width: 36rpx;
+  height: 36rpx;
+  border: 2rpx solid #ddd;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 24rpx;
+  color: #fff;
+  box-sizing: border-box;
+}
+
+.selectCheckbox.checked {
+  background-color: #ff6b35;
+  border-color: #ff6b35;
+}
+
+.selectAllText {
+  font-size: 28rpx;
+  color: #333;
+}
+
+.selectCount {
+  font-size: 26rpx;
+  color: #999;
+}
+
+// 批量操作底部栏
+.batchFooter {
+  position: fixed;
+  bottom: 20rpx;
+  left: 20rpx;
+  right: 20rpx;
+  display: flex;
+  gap: 20rpx;
+  z-index: 100;
+}
+
+.batchBtn {
+  @include button-reset;
+  flex: 1;
+  height: 88rpx;
+  border-radius: 44rpx;
+  font-size: 30rpx;
+  font-weight: $font-weight-medium;
+  transition: all $transition-base;
+
+  &:active {
+    opacity: 0.9;
+    transform: scale(0.98);
+  }
+}
+
+.batchBtnOutline {
+  border: 2rpx solid #ddd;
+  background-color: #fff;
+  color: #333;
+}
+
+.batchBtnDanger {
+  background-color: #F44336;
+  color: #fff;
+}

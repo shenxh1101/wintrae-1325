@@ -7,10 +7,8 @@ import SectionHeader from '@/components/SectionHeader';
 import RoomCard from '@/components/RoomCard';
 import Tag from '@/components/Tag';
 import { rooms } from '@/data/rooms';
-import { orders } from '@/data/orders';
-import { pets as allPets } from '@/data/pets';
-import { rooms as roomsData } from '@/data/rooms';
 import { useOrderStore } from '@/store/useOrderStore';
+import { usePetStore } from '@/store/usePetStore';
 import type { Room } from '@/types/room';
 
 const roomFilters = [
@@ -24,13 +22,18 @@ const roomFilters = [
 const HomePage: React.FC = () => {
   const [activeFilter, setActiveFilter] = useState('all');
   const setSelectedRoom = useOrderStore((state) => state.setSelectedRoom);
+  const orders = useOrderStore((state) => state.orders);
+  const getActiveOrders = useOrderStore((state) => state.getActiveOrders);
+  const pets = usePetStore((state) => state.pets);
 
-  const currentOrder = useMemo(() => {
-    return orders.find((o) => o.status === 'care' || o.status === 'checkin' || o.status === 'confirmed');
-  }, []);
+  const activeOrders = useMemo(() => getActiveOrders(), [orders, getActiveOrders]);
+  const currentOrder = activeOrders[0] || null;
 
-  const orderRoom = currentOrder ? roomsData.find((r) => r.id === currentOrder.roomId) : null;
-  const orderPet = currentOrder ? allPets.find((p) => p.id === currentOrder.petIds[0]) : null;
+  const orderRoom = currentOrder?.room || null;
+  const orderPet = useMemo(() => {
+    if (!currentOrder?.petIds?.[0]) return null;
+    return pets.find((p) => p.id === currentOrder.petIds[0]) || null;
+  }, [currentOrder, pets]);
 
   const filteredRooms = useMemo(() => {
     if (activeFilter === 'all') return rooms;

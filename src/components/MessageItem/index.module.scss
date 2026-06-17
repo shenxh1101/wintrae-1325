@@ -128,3 +128,31 @@
   font-size: $font-size-xs;
   color: $color-text-tertiary;
 }
+
+.selectMode {
+  padding-left: 88rpx;
+  position: relative;
+}
+
+.checkbox {
+  position: absolute;
+  left: $spacing-lg;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 36rpx;
+  height: 36rpx;
+  border: 2rpx solid #ddd;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: 20rpx;
+  font-size: 24rpx;
+  color: #fff;
+  box-sizing: border-box;
+}
+
+.checkbox.checked {
+  background-color: #ff6b35;
+  border-color: #ff6b35;
+}

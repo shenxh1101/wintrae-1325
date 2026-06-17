@@ -9,6 +9,10 @@ import dayjs from 'dayjs';
 interface MessageItemProps {
   message: Message;
   onClick?: (message: Message) => void;
+  onLongPress?: (message: Message) => void;
+  selectMode?: boolean;
+  selected?: boolean;
+  onSelectChange?: (id: string, selected: boolean) => void;
 }
 
 const typeIconMap: Record<MessageType, string> = {
@@ -19,12 +23,31 @@ const typeIconMap: Record<MessageType, string> = {
   chat: '💬'
 };
 
-const MessageItem: React.FC<MessageItemProps> = ({ message, onClick }) => {
+const MessageItem: React.FC<MessageItemProps> = ({
+  message,
+  onClick,
+  onLongPress,
+  selectMode = false,
+  selected = false,
+  onSelectChange
+}) => {
   const handleClick = () => {
+    if (selectMode) {
+      if (onSelectChange) {
+        onSelectChange(message.id, !selected);
+      }
+      return;
+    }
     if (onClick) {
       onClick(message);
     } else if (message.action?.target) {
       Taro.navigateTo({ url: message.action.target });
+    }
+  };
+
+  const handleLongPress = () => {
+    if (onLongPress) {
+      onLongPress(message);
     }
   };
 
@@ -47,7 +70,16 @@ const MessageItem: React.FC<MessageItemProps> = ({ message, onClick }) => {
   const isUnread = message.status === 'unread';
 
   return (
-    <View className={classnames(styles.item, isUnread && styles.unread)} onClick={handleClick}>
+    <View
+      className={classnames(styles.item, isUnread && styles.unread, selectMode && styles.selectMode)}
+      onClick={handleClick}
+      onLongPress={handleLongPress}
+    >
+      {selectMode && (
+        <View className={classnames(styles.checkbox, selected && styles.checked)}>
+          <Text>{selected ? '✓' : ''}</Text>
+        </View>
+      )}
       {message.type === 'chat' && message.senderAvatar ? (
         <View className={styles.icon} style={{ padding: 0, overflow: 'hidden' }}>
           <Image className={styles.avatar} src={message.senderAvatar} mode="aspectFill" />

@@ -20,7 +20,7 @@ const tabs = [
 ];
 
 const PetsPage: React.FC = () => {
-  const { pets } = usePetStore();
+  const { pets, deletePet } = usePetStore();
   const [activeTab, setActiveTab] = useState<TabType>('all');
 
   const filteredPets = useMemo(() => {
@@ -63,9 +63,11 @@ const PetsPage: React.FC = () => {
   const handleDeletePet = (pet: Pet) => {
     Taro.showModal({
       title: '确认删除',
-      content: `确定要删除 ${pet.name} 的档案吗？`,
+      content: `确定要删除 ${pet.name} 的档案吗？删除后无法恢复。`,
+      confirmColor: '#F44336',
       success: (res) => {
         if (res.confirm) {
+          deletePet(pet.id);
           Taro.showToast({ title: '已删除', icon: 'success' });
         }
       }

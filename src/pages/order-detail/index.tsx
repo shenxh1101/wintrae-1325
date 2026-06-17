@@ -66,7 +66,8 @@ const serviceTypeIcons: Record<string, string> = {
 const OrderDetailPage: React.FC = () => {
   const router = useRouter();
   const orderId = router.params.id;
-  const { getOrderById } = useOrderStore();
+  const { getOrderById, applyCancelOrder, contactStoreFromOrder, updateOrderDates, addonServices } =
+    useOrderStore();
 
   const order = useMemo(() => {
     if (!orderId) return undefined;
@@ -85,17 +86,101 @@ const OrderDetailPage: React.FC = () => {
   };
 
   const handleContact = () => {
-    Taro.showToast({ title: '正在联系门店...', icon: 'none' });
+    if (!order) return;
+    Taro.showActionSheet({
+      itemList: ['在线咨询', '拨打电话', '留言给门店'],
+      success: (res) => {
+        if (res.tapIndex === 0) {
+          contactStoreFromOrder(order.id, '主人发起了在线咨询');
+          Taro.showToast({ title: '已通知门店客服', icon: 'none' });
+          setTimeout(() => {
+            Taro.switchTab({ url: '/pages/messages/index' });
+          }, 800);
+        } else if (res.tapIndex === 1) {
+          Taro.makePhoneCall({ phoneNumber: '4008888888' });
+        } else if (res.tapIndex === 2) {
+          Taro.showModal({
+            title: '留言给门店',
+            editable: true,
+            placeholderText: '请输入您想咨询的内容',
+            success: (modalRes) => {
+              if (modalRes.confirm && modalRes.content) {
+                contactStoreFromOrder(order.id, modalRes.content);
+                Taro.showToast({ title: '留言已发送', icon: 'success' });
+              }
+            }
+          });
+        }
+      }
+    });
   };
 
   const handleCancel = () => {
+    if (!order) return;
     Taro.showModal({
-      title: '取消订单',
-      content: '确定要取消该订单吗？取消后押金将原路退还。',
+      title: '申请取消订单',
+      content: '确定要取消该订单吗？取消后押金将原路退回。',
       confirmColor: '#F44336',
+      editable: true,
+      placeholderText: '请输入取消原因（可选）',
       success: (res) => {
         if (res.confirm) {
-          Taro.showToast({ title: '订单已取消', icon: 'none' });
+          applyCancelOrder(order.id, res.content || '');
+          Taro.showToast({ title: '订单已取消', icon: 'success' });
+        }
+      }
+    });
+  };
+
+  const handleReschedule = () => {
+    if (!order) return;
+    Taro.showActionSheet({
+      itemList: ['修改入住日期', '修改离店日期', '调整附加服务'],
+      success: (sheetRes) => {
+        if (sheetRes.tapIndex === 0 || sheetRes.tapIndex === 1) {
+          const isCheckin = sheetRes.tapIndex === 0;
+          const defaultDate = isCheckin ? order.checkinDate : order.checkoutDate;
+          Taro.chooseDate && Taro.chooseDate
+            ? // @ts-ignore
+              Taro.chooseDate({
+                type: 'date',
+                current: defaultDate,
+                success: (dateRes) => {
+                  const newDate = dateRes.value;
+                  if (isCheckin) {
+                    if (new Date(newDate) >= new Date(order.checkoutDate)) {
+                      Taro.showToast({ title: '入住日期需早于离店日期', icon: 'none' });
+                      return;
+                    }
+                    updateOrderDates(order.id, newDate, order.checkoutDate);
+                  } else {
+                    if (new Date(newDate) <= new Date(order.checkinDate)) {
+                      Taro.showToast({ title: '离店日期需晚于入住日期', icon: 'none' });
+                      return;
+                    }
+                    updateOrderDates(order.id, order.checkinDate, newDate);
+                  }
+                  Taro.showToast({ title: '改期成功', icon: 'success' });
+                }
+              })
+            : Taro.showToast({ title: '当前环境不支持日期选择', icon: 'none' });
+        } else if (sheetRes.tapIndex === 2) {
+          const addonNames = addonServices.map((a) => a.name);
+          const currentIds = order.addonServices?.map((a) => a.id) || [];
+          Taro.showActionSheet({
+            itemList: addonNames.map((name, i) => {
+              const id = addonServices[i].id;
+              return currentIds.includes(id) ? `✓ ${name}` : name;
+            }),
+            success: (addonRes) => {
+              const clickedId = addonServices[addonRes.tapIndex].id;
+              const newIds = currentIds.includes(clickedId)
+                ? currentIds.filter((id) => id !== clickedId)
+                : [...currentIds, clickedId];
+              useOrderStore.getState().updateOrderAddons(order.id, newIds);
+              Taro.showToast({ title: '附加服务已更新', icon: 'success' });
+            }
+          });
         }
       }
     });
@@ -178,6 +263,9 @@ const OrderDetailPage: React.FC = () => {
       case 'pending':
         return (
           <>
+            <Button className={classnames(styles.footerBtn, styles.footerBtnOutline)} onClick={handleReschedule}>
+              改期
+            </Button>
             <Button className={classnames(styles.footerBtn, styles.footerBtnOutline)} onClick={handleCancel}>
               取消订单
             </Button>
@@ -192,6 +280,9 @@ const OrderDetailPage: React.FC = () => {
             <Button className={classnames(styles.footerBtn, styles.footerBtnOutline)} onClick={handleContact}>
               联系门店
             </Button>
+            <Button className={classnames(styles.footerBtn, styles.footerBtnOutline)} onClick={handleReschedule}>
+              改期
+            </Button>
             <Button className={classnames(styles.footerBtn, styles.footerBtnPrimary)} onClick={handleCancel}>
               取消订单
             </Button>
@@ -204,6 +295,9 @@ const OrderDetailPage: React.FC = () => {
           <>
             <Button className={classnames(styles.footerBtn, styles.footerBtnOutline)} onClick={handleContact}>
               联系门店
+            </Button>
+            <Button className={classnames(styles.footerBtn, styles.footerBtnOutline)} onClick={handleReschedule}>
+              改期
             </Button>
             <Button className={classnames(styles.footerBtn, styles.footerBtnSuccess)} onClick={handleCare}>
               查看照护
