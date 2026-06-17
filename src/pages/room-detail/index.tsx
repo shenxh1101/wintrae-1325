@@ -1,24 +1,46 @@
 import React, { useState, useMemo } from 'react';
 import { View, Text, Button, Image, ScrollView } from '@tarojs/components';
-import Taro, { useRouter } from '@tarojs/taro';
+import Taro, { useRouter, useDidShow } from '@tarojs/taro';
 import styles from './index.module.scss';
 import classnames from 'classnames';
 import Tag from '@/components/Tag';
 import { rooms } from '@/data/rooms';
+import { useOrderStore } from '@/store/useOrderStore';
 
 const facilityIcons: Record<string, { icon: string; bg: string }> = {
-  '空调': { icon: '❄️', bg: 'rgba(66, 165, 245, 0.1)' },
-  '地暖': { icon: '🔥', bg: 'rgba(244, 67, 54, 0.1)' },
-  '新风': { icon: '💨', bg: 'rgba(76, 175, 80, 0.1)' },
-  '监控': { icon: '📹', bg: 'rgba(156, 39, 176, 0.1)' },
-  '软垫': { icon: '🛏️', bg: 'rgba(255, 152, 0, 0.1)' },
-  '玩具': { icon: '🎾', bg: 'rgba(255, 193, 7, 0.1)' },
-  '食盆': { icon: '🍽️', bg: 'rgba(0, 188, 212, 0.1)' },
-  '水盆': { icon: '💧', bg: 'rgba(33, 150, 243, 0.1)' },
-  '猫爬架': { icon: '🏔️', bg: 'rgba(121, 85, 72, 0.1)' },
+  '独立通风': { icon: '💨', bg: 'rgba(76, 175, 80, 0.1)' },
+  '恒温空调': { icon: '❄️', bg: 'rgba(66, 165, 245, 0.1)' },
+  '柔软睡床': { icon: '🛏️', bg: 'rgba(255, 152, 0, 0.1)' },
+  '每日消毒': { icon: '🧼', bg: 'rgba(0, 188, 212, 0.1)' },
+  '饮水器': { icon: '💧', bg: 'rgba(33, 150, 243, 0.1)' },
+  '监控摄像': { icon: '📹', bg: 'rgba(156, 39, 176, 0.1)' },
+  '宽敞空间': { icon: '🏠', bg: 'rgba(255, 193, 7, 0.1)' },
+  '多张睡床': { icon: '🛏️', bg: 'rgba(255, 152, 0, 0.15)' },
+  '玩具区': { icon: '🎾', bg: 'rgba(255, 193, 7, 0.12)' },
+  '落地窗': { icon: '🪟', bg: 'rgba(103, 58, 183, 0.1)' },
+  '阳光充足': { icon: '☀️', bg: 'rgba(255, 235, 59, 0.2)' },
+  '豪华软垫': { icon: '🛋️', bg: 'rgba(233, 30, 99, 0.1)' },
+  '猫爬架': { icon: '🏔️', bg: 'rgba(121, 85, 72, 0.12)' },
+  '独立空调': { icon: '🌬️', bg: 'rgba(66, 165, 245, 0.1)' },
+  '24h监控': { icon: '📹', bg: 'rgba(156, 39, 176, 0.15)' },
+  '自动喂食器': { icon: '🍽️', bg: 'rgba(76, 175, 80, 0.1)' },
+  '独立套房': { icon: '🏡', bg: 'rgba(255, 152, 0, 0.15)' },
+  '高级家具': { icon: '🛋️', bg: 'rgba(121, 85, 72, 0.1)' },
+  '护理台': { icon: '💉', bg: 'rgba(244, 67, 54, 0.1)' },
+  '专属保姆': { icon: '👩‍🍳', bg: 'rgba(156, 39, 176, 0.1)' },
+  '定制餐食': { icon: '🍖', bg: 'rgba(255, 87, 34, 0.1)' },
+  '每日SPA': { icon: '✨', bg: 'rgba(0, 188, 212, 0.1)' },
+  '视频直播': { icon: '📺', bg: 'rgba(33, 150, 243, 0.12)' },
+  '磨爪柱': { icon: '🐱', bg: 'rgba(121, 85, 72, 0.1)' },
+  '躲藏洞穴': { icon: '🕳️', bg: 'rgba(96, 125, 139, 0.1)' },
+  '多层跳台': { icon: '📶', bg: 'rgba(66, 165, 245, 0.1)' },
   '猫砂盆': { icon: '📦', bg: 'rgba(158, 158, 158, 0.1)' },
-  '围栏': { icon: '🚧', bg: 'rgba(255, 87, 34, 0.1)' },
-  '草坪': { icon: '🌿', bg: 'rgba(139, 195, 74, 0.1)' }
+  '超宽敞': { icon: '🏟️', bg: 'rgba(76, 175, 80, 0.1)' },
+  '防滑地垫': { icon: '🟫', bg: 'rgba(121, 85, 72, 0.08)' },
+  '户外通道': { icon: '🌿', bg: 'rgba(139, 195, 74, 0.12)' },
+  '加厚睡床': { icon: '🛏️', bg: 'rgba(255, 152, 0, 0.15)' },
+  '每日遛弯x3': { icon: '🐕', bg: 'rgba(76, 175, 80, 0.12)' },
+  '专用食盆': { icon: '🥣', bg: 'rgba(255, 193, 7, 0.1)' }
 };
 
 const services = [
@@ -42,22 +64,20 @@ const notices = [
 const RoomDetailPage: React.FC = () => {
   const router = useRouter();
   const roomId = router.params.id;
+  const setSelectedRoom = useOrderStore((state) => state.setSelectedRoom);
 
   const room = useMemo(() => rooms.find((r) => r.id === roomId) || rooms[0], [roomId]);
 
   const [fav, setFav] = useState(false);
-  const [imgIndex] = useState(1);
 
   const handleBack = () => {
     Taro.navigateBack();
   };
 
   const handleBook = () => {
+    setSelectedRoom(room.id);
     Taro.switchTab({
-      url: '/pages/booking/index',
-      success: () => {
-        Taro.showToast({ title: '请选择此房型', icon: 'none' });
-      }
+      url: '/pages/booking/index'
     });
   };
 
@@ -72,8 +92,10 @@ const RoomDetailPage: React.FC = () => {
         <View className={styles.bannerFav} onClick={() => setFav(!fav)}>
           <Text className={styles.bannerFavIcon}>{fav ? '❤️' : '🤍'}</Text>
         </View>
-        <View className={styles.bannerIndicator}>
-          {imgIndex}/{room.images.length}
+        <View className={styles.bannerTag}>
+          <Tag type="primary" size="sm">
+            {room.size} · 可住{room.capacity}只
+          </Tag>
         </View>
       </View>
 
@@ -85,8 +107,8 @@ const RoomDetailPage: React.FC = () => {
               <View className={styles.infoName}>
                 <View className={styles.nameRow}>
                   <Text className={styles.nameText}>{room.name}</Text>
-                  {room.hot && <Tag type="warning" size="sm">热门</Tag>}
                   {room.type === 'vip' && <Tag type="primary" size="sm">VIP</Tag>}
+                  {room.isAvailable && <Tag type="success" size="sm">可预订</Tag>}
                 </View>
                 <View className={styles.tagsRow}>
                   {room.tags.map((tag, i) => (
@@ -102,9 +124,16 @@ const RoomDetailPage: React.FC = () => {
                   <Text className={styles.priceValue}>¥{room.price}</Text>
                   <Text className={styles.priceUnit}>/晚</Text>
                 </View>
+                {room.originalPrice && room.originalPrice > room.price && (
+                  <Text className={styles.originalPrice}>¥{room.originalPrice}</Text>
+                )}
               </View>
             </View>
             <View className={styles.infoDesc}>{room.description}</View>
+            <View className={styles.ratingRow}>
+              <Text className={styles.ratingStars}>⭐ {room.rating}</Text>
+              <Text className={styles.reviewCount}>{room.reviewCount}条评价</Text>
+            </View>
           </View>
 
           {/* 房间设施 */}
@@ -122,7 +151,7 @@ const RoomDetailPage: React.FC = () => {
                       className={styles.facilityIcon}
                       style={{ backgroundColor: f.bg }}
                     >
-                      {f.icon}
+                      <Text className={styles.facilityIconText}>{f.icon}</Text>
                     </View>
                     <Text className={styles.facilityName}>{facility}</Text>
                   </View>
@@ -140,7 +169,9 @@ const RoomDetailPage: React.FC = () => {
             <View className={styles.serviceList}>
               {services.map((s, i) => (
                 <View key={i} className={styles.serviceItem}>
-                  <View className={styles.serviceIcon}>{s.icon}</View>
+                  <View className={styles.serviceIcon}>
+                    <Text>{s.icon}</Text>
+                  </View>
                   <View className={styles.serviceContent}>
                     <Text className={styles.serviceTitle}>{s.title}</Text>
                     <Text className={styles.serviceDesc}>{s.desc}</Text>
@@ -165,6 +196,32 @@ const RoomDetailPage: React.FC = () => {
               ))}
             </View>
           </View>
+
+          {/* 可住宠物信息 */}
+          <View className={styles.sectionCard}>
+            <View className={styles.sectionTitle}>
+              <Text>🐾</Text>
+              <Text>可住宠物</Text>
+            </View>
+            <View className={styles.capacityBox}>
+              <View className={styles.capacityItem}>
+                <Text className={styles.capacityIcon}>🐕</Text>
+                <Text className={styles.capacityText}>小型犬/中型犬</Text>
+              </View>
+              <View className={styles.capacityItem}>
+                <Text className={styles.capacityIcon}>🐈</Text>
+                <Text className={styles.capacityText}>猫咪</Text>
+              </View>
+              <View className={styles.capacityItem}>
+                <Text className={styles.capacityNumber}>{room.capacity}</Text>
+                <Text className={styles.capacityText}>最多{room.capacity}只</Text>
+              </View>
+            </View>
+            <View className={styles.sizeRow}>
+              <Text className={styles.sizeLabel}>房间面积</Text>
+              <Text className={styles.sizeValue}>{room.size}</Text>
+            </View>
+          </View>
         </View>
       </ScrollView>
 
@@ -175,7 +232,7 @@ const RoomDetailPage: React.FC = () => {
             <Text className={styles.footerPrice}>¥{room.price}</Text>
             <Text className={styles.footerPriceUnit}>/晚起</Text>
           </View>
-          <Text className={styles.footerDesc}>可住 {room.maxPets} 只宠物</Text>
+          <Text className={styles.footerDesc}>可住 {room.capacity} 只宠物</Text>
         </View>
         <Button className={styles.footerBtn} onClick={handleBook}>
           立即预约

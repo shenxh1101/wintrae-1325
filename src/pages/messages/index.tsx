@@ -1,22 +1,24 @@
 import React, { useState, useMemo } from 'react';
-import { View, Text, Button, Image, ScrollView, Input, Textarea } from '@tarojs/components';
+import { View, Text, Button, Image, ScrollView, Textarea } from '@tarojs/components';
 import Taro from '@tarojs/taro';
 import styles from './index.module.scss';
 import classnames from 'classnames';
 import MessageItem from '@/components/MessageItem';
 import Empty from '@/components/Empty';
-import { messages as mockMessages } from '@/data/messages';
+import { messages as mockMessages, chatMessages } from '@/data/messages';
 import { pets as mockPets } from '@/data/pets';
+import { orders as mockOrders } from '@/data/orders';
 import type { Message, MessageType } from '@/types/message';
 import dayjs from 'dayjs';
 
-type TabType = 'all' | 'system' | 'order' | 'care';
+type TabType = 'all' | 'system' | 'order' | 'reminder' | 'chat';
 
 const tabs = [
   { key: 'all', label: '全部' },
   { key: 'system', label: '系统' },
   { key: 'order', label: '订单' },
-  { key: 'care', label: '照护' }
+  { key: 'reminder', label: '提醒' },
+  { key: 'chat', label: '聊天' }
 ];
 
 const MessagesPage: React.FC = () => {
@@ -25,73 +27,107 @@ const MessagesPage: React.FC = () => {
   const [reviewRating, setReviewRating] = useState<number>(0);
   const [reviewContent, setReviewContent] = useState<string>('');
 
-  const unreadCount = useMemo(() => messages.filter((m) => !m.read).length, [messages]);
+  const unreadCount = useMemo(
+    () => messages.filter((m) => m.status === 'unread').length,
+    [messages]
+  );
   const systemUnread = useMemo(
-    () => messages.filter((m) => m.type === 'system' && !m.read).length,
+    () => messages.filter((m) => m.type === 'system' && m.status === 'unread').length,
     [messages]
   );
   const orderUnread = useMemo(
-    () => messages.filter((m) => m.type === 'order' && !m.read).length,
+    () => messages.filter((m) => m.type === 'order' && m.status === 'unread').length,
     [messages]
   );
-  const careUnread = useMemo(
-    () => messages.filter((m) => m.type === 'care' && !m.read).length,
+  const reminderUnread = useMemo(
+    () => messages.filter((m) => m.type === 'reminder' && m.status === 'unread').length,
+    [messages]
+  );
+  const chatUnread = useMemo(
+    () => messages.filter((m) => m.type === 'chat' && m.status === 'unread').length,
     [messages]
   );
 
   const filteredMessages = useMemo(() => {
     switch (activeTab) {
       case 'system':
-        return messages.filter((m) => m.type === 'system');
+        return messages.filter((m) => m.type === 'system' || m.type === 'review');
       case 'order':
         return messages.filter((m) => m.type === 'order');
-      case 'care':
-        return messages.filter((m) => m.type === 'care');
+      case 'reminder':
+        return messages.filter((m) => m.type === 'reminder');
+      case 'chat':
+        return messages.filter((m) => m.type === 'chat');
       default:
         return messages;
     }
   }, [activeTab, messages]);
 
-  const chatSessions = [
-    {
-      id: 'staff',
-      name: '专属照护师 小林',
-      avatar: '👩‍🔬',
-      avatarSecondary: false,
-      online: true,
-      lastMessage: '好的，豆豆今天胃口很好，您放心~',
-      lastTime: '10:32',
-      unread: 2
-    },
-    {
-      id: 'customer',
-      name: '门店客服',
-      avatar: '📞',
-      avatarSecondary: true,
-      online: true,
-      lastMessage: '感谢您的评价，我们会继续努力！',
-      lastTime: '昨天',
-      unread: 0
-    }
-  ];
+  const chatSessions = useMemo(() => {
+    const sessionMap = new Map<string, Message>();
+    messages
+      .filter((m) => m.type === 'chat')
+      .forEach((m) => {
+        const senderId = m.senderId || 'unknown';
+        if (!sessionMap.has(senderId)) {
+          sessionMap.set(senderId, m);
+        }
+      });
+    return Array.from(sessionMap.values()).map((m) => ({
+      id: m.senderId || 'unknown',
+      name: m.senderName || '店员',
+      avatar: m.senderAvatar || '',
+      lastMessage: m.summary || m.content,
+      lastTime: dayjs(m.timestamp).format('HH:mm'),
+      unread: m.status === 'unread' ? 1 : 0,
+      online: true
+    }));
+  }, [messages]);
 
-  const pendingReview = {
-    orderNo: 'ORD20250108001',
-    pet: mockPets[0],
-    roomName: '豪华观景房',
-    checkIn: '01月05日',
-    checkOut: '01月10日'
-  };
+  const pendingReview = useMemo(() => {
+    const reviewMsg = messages.find((m) => m.type === 'review' && m.status === 'unread');
+    if (!reviewMsg) return null;
+    const order = mockOrders.find((o) => o.id === reviewMsg.orderId);
+    if (!order) return null;
+    const pet = order.pets?.[0] || mockPets[0];
+    return {
+      orderNo: order.orderNo,
+      pet,
+      roomName: order.room?.name || '豪华观景房',
+      checkIn: dayjs(order.checkinDate).format('MM月DD日'),
+      checkOut: dayjs(order.checkoutDate).format('MM月DD日')
+    };
+  }, [messages]);
 
   const handleReadMessage = (msg: Message) => {
-    setMessages((prev) => prev.map((m) => (m.id === msg.id ? { ...m, read: true } : m)));
-    if (msg.actionUrl) {
-      Taro.navigateTo({ url: msg.actionUrl });
+    setMessages((prev) =>
+      prev.map((m) => (m.id === msg.id ? { ...m, status: 'read' as const } : m))
+    );
+
+    let targetUrl = '';
+    if (msg.action && msg.action.type === 'navigate' && msg.action.target) {
+      targetUrl = msg.action.target;
+    } else if (msg.orderId) {
+      targetUrl = `/pages/order-detail/index?id=${msg.orderId}`;
+    }
+
+    if (targetUrl) {
+      const tabPages = ['/pages/care', '/pages/messages', '/pages/booking', '/pages/pets', '/pages/home'];
+      const isTabPage = tabPages.some((p) => targetUrl.startsWith(p));
+      if (isTabPage) {
+        Taro.switchTab({ url: targetUrl.split('?')[0] });
+      } else {
+        Taro.navigateTo({ url: targetUrl });
+      }
     }
   };
 
   const handleChatClick = (chatId: string) => {
-    Taro.showToast({ title: `打开聊天窗口: ${chatId}`, icon: 'none' });
+    const chatMsg = messages.find((m) => m.senderId === chatId);
+    if (chatMsg) {
+      handleReadMessage(chatMsg);
+    }
+    Taro.showToast({ title: '聊天功能开发中', icon: 'none' });
   };
 
   const handleQuickAction = (action: string) => {
@@ -114,6 +150,14 @@ const MessagesPage: React.FC = () => {
       content: `确认提交 ${reviewRating} 星评价？`,
       success: (res) => {
         if (res.confirm) {
+          const reviewMsg = messages.find((m) => m.type === 'review');
+          if (reviewMsg) {
+            setMessages((prev) =>
+              prev.map((m) =>
+                m.id === reviewMsg.id ? { ...m, status: 'read' as const } : m
+              )
+            );
+          }
           Taro.showToast({ title: '评价提交成功！', icon: 'success' });
           setReviewRating(0);
           setReviewContent('');
@@ -128,8 +172,10 @@ const MessagesPage: React.FC = () => {
         return systemUnread;
       case 'order':
         return orderUnread;
-      case 'care':
-        return careUnread;
+      case 'reminder':
+        return reminderUnread;
+      case 'chat':
+        return chatUnread;
       default:
         return 0;
     }
@@ -141,39 +187,73 @@ const MessagesPage: React.FC = () => {
         {/* 消息统计卡片 */}
         <View className={styles.statsBar}>
           <View className={styles.statCard}>
-            <View className={styles.statIcon}>🔔</View>
-            <View className={styles.statNumber}>{unreadCount}</View>
-            <View className={styles.statLabel}>未读消息</View>
-            {unreadCount > 0 && <View className={styles.statBadge}>{unreadCount > 99 ? '99+' : unreadCount}</View>}
+            <View className={styles.statIcon}>
+              <Text>🔔</Text>
+            </View>
+            <Text className={styles.statNumber}>{unreadCount}</Text>
+            <Text className={styles.statLabel}>未读消息</Text>
+            {unreadCount > 0 && (
+              <View className={styles.statBadge}>
+                <Text>{unreadCount > 99 ? '99+' : unreadCount}</Text>
+              </View>
+            )}
           </View>
           <View className={styles.statCard}>
-            <View className={styles.statIcon}>📦</View>
-            <View className={styles.statNumber}>{messages.filter((m) => m.type === 'order').length}</View>
-            <View className={styles.statLabel}>订单提醒</View>
+            <View className={styles.statIcon}>
+              <Text>📦</Text>
+            </View>
+            <Text className={styles.statNumber}>
+              {messages.filter((m) => m.type === 'order').length}
+            </Text>
+            <Text className={styles.statLabel}>订单提醒</Text>
           </View>
           <View className={styles.statCard}>
-            <View className={styles.statIcon}>🐾</View>
-            <View className={styles.statNumber}>{messages.filter((m) => m.type === 'care').length}</View>
-            <View className={styles.statLabel}>照护动态</View>
+            <View className={styles.statIcon}>
+              <Text>🐾</Text>
+            </View>
+            <Text className={styles.statNumber}>
+              {messages.filter((m) => m.type === 'reminder').length}
+            </Text>
+            <Text className={styles.statLabel}>照护提醒</Text>
           </View>
         </View>
 
         {/* 快捷操作 */}
         <View className={styles.quickActions}>
-          <View className={styles.quickAction} onClick={() => handleQuickAction('contact')}>
-            <View className={classnames(styles.quickActionIcon, styles.iconPrimary)}>📞</View>
+          <View
+            className={styles.quickAction}
+            onClick={() => handleQuickAction('contact')}
+          >
+            <View className={classnames(styles.quickActionIcon, styles.iconPrimary)}>
+              <Text>📞</Text>
+            </View>
             <Text className={styles.quickActionLabel}>联系客服</Text>
           </View>
-          <View className={styles.quickAction} onClick={() => handleQuickAction('complaint')}>
-            <View className={classnames(styles.quickActionIcon, styles.iconSuccess)}>💬</View>
+          <View
+            className={styles.quickAction}
+            onClick={() => handleQuickAction('complaint')}
+          >
+            <View className={classnames(styles.quickActionIcon, styles.iconSuccess)}>
+              <Text>💬</Text>
+            </View>
             <Text className={styles.quickActionLabel}>投诉建议</Text>
           </View>
-          <View className={styles.quickAction} onClick={() => handleQuickAction('invoice')}>
-            <View className={classnames(styles.quickActionIcon, styles.iconInfo)}>📄</View>
+          <View
+            className={styles.quickAction}
+            onClick={() => handleQuickAction('invoice')}
+          >
+            <View className={classnames(styles.quickActionIcon, styles.iconInfo)}>
+              <Text>📄</Text>
+            </View>
             <Text className={styles.quickActionLabel}>发票申请</Text>
           </View>
-          <View className={styles.quickAction} onClick={() => handleQuickAction('feedback')}>
-            <View className={classnames(styles.quickActionIcon, styles.iconWarning)}>✨</View>
+          <View
+            className={styles.quickAction}
+            onClick={() => handleQuickAction('feedback')}
+          >
+            <View className={classnames(styles.quickActionIcon, styles.iconWarning)}>
+              <Text>✨</Text>
+            </View>
             <Text className={styles.quickActionLabel}>意见反馈</Text>
           </View>
         </View>
@@ -234,44 +314,57 @@ const MessagesPage: React.FC = () => {
         )}
 
         {/* 聊天会话列表 */}
-        <View className={styles.chatSection}>
-          <View className={styles.sectionHeader}>
-            <View className={styles.sectionTitle}>
-              <Text>💬</Text>
-              <Text>在线沟通</Text>
-            </View>
-            <Text className={styles.sectionCount}>{chatSessions.length}个会话</Text>
-          </View>
-          <View className={styles.chatList}>
-            {chatSessions.map((chat) => (
-              <View
-                key={chat.id}
-                className={styles.chatItem}
-                onClick={() => handleChatClick(chat.id)}
-              >
-                <View
-                  className={classnames(
-                    styles.chatAvatar,
-                    chat.avatarSecondary && styles.chatAvatarSecondary
-                  )}
-                >
-                  <Text>{chat.avatar}</Text>
-                  {chat.online && <View className={styles.chatOnline} />}
-                </View>
-                <View className={styles.chatContent}>
-                  <View className={styles.chatHeader}>
-                    <Text className={styles.chatName}>{chat.name}</Text>
-                    <Text className={styles.chatTime}>{chat.lastTime}</Text>
-                  </View>
-                  <View className={styles.chatPreview}>
-                    <Text className={styles.chatPreviewText}>{chat.lastMessage}</Text>
-                    {chat.unread > 0 && <View className={styles.chatBadge}>{chat.unread}</View>}
-                  </View>
-                </View>
+        {chatSessions.length > 0 && (
+          <View className={styles.chatSection}>
+            <View className={styles.sectionHeader}>
+              <View className={styles.sectionTitle}>
+                <Text>💬</Text>
+                <Text>在线沟通</Text>
               </View>
-            ))}
+              <Text className={styles.sectionCount}>{chatSessions.length}个会话</Text>
+            </View>
+            <View className={styles.chatList}>
+              {chatSessions.map((chat) => (
+                <View
+                  key={chat.id}
+                  className={styles.chatItem}
+                  onClick={() => handleChatClick(chat.id)}
+                >
+                  <View className={styles.chatAvatarBox}>
+                    {chat.avatar ? (
+                      <Image
+                        className={styles.chatAvatar}
+                        src={chat.avatar}
+                        mode="aspectFill"
+                      />
+                    ) : (
+                      <View className={styles.chatAvatarEmoji}>
+                        <Text>👩‍🔬</Text>
+                      </View>
+                    )}
+                    {chat.online && <View className={styles.chatOnline} />}
+                  </View>
+                  <View className={styles.chatContent}>
+                    <View className={styles.chatHeader}>
+                      <Text className={styles.chatName}>{chat.name}</Text>
+                      <Text className={styles.chatTime}>{chat.lastTime}</Text>
+                    </View>
+                    <View className={styles.chatPreview}>
+                      <Text className={styles.chatPreviewText} numberOfLines={1}>
+                        {chat.lastMessage}
+                      </Text>
+                      {chat.unread > 0 && (
+                        <View className={styles.chatBadge}>
+                          <Text>{chat.unread}</Text>
+                        </View>
+                      )}
+                    </View>
+                  </View>
+                </View>
+              ))}
+            </View>
           </View>
-        </View>
+        )}
 
         {/* Tab切换 */}
         <View className={styles.sectionHeader}>
@@ -288,10 +381,10 @@ const MessagesPage: React.FC = () => {
               className={classnames(styles.tabItem, activeTab === tab.key && styles.activeTab)}
               onClick={() => setActiveTab(tab.key as TabType)}
             >
-              {tab.label}
+              <Text>{tab.label}</Text>
               {getTabBadge(tab.key) > 0 && (
                 <View className={styles.tabBadge}>
-                  {getTabBadge(tab.key) > 99 ? '99+' : getTabBadge(tab.key)}
+                  <Text>{getTabBadge(tab.key) > 99 ? '99+' : getTabBadge(tab.key)}</Text>
                 </View>
               )}
             </View>

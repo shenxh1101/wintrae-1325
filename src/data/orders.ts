@@ -1,4 +1,6 @@
-import type { Order, AddonService } from '@/types/order';
+import type { Order, AddonService, FeeDetail } from '@/types/order';
+import { rooms } from './rooms';
+import { pets } from './pets';
 
 export const addonServices: AddonService[] = [
   {
@@ -50,13 +52,15 @@ export const orders: Order[] = [
     id: 'o001',
     orderNo: 'FY20260618001',
     roomId: 'r003',
+    room: rooms.find(r => r.id === 'r003'),
     petIds: ['p001'],
+    pets: pets.filter(p => ['p001'].includes(p.id)),
     checkinDate: '2026-06-18',
     checkoutDate: '2026-06-22',
     nights: 4,
     addonServices: [
-      { id: 's001', name: '基础洗护', type: 'grooming', price: 88, description: '洗澡、吹干、梳理毛发、剪指甲、清洁耳道' },
-      { id: 's003', name: '上门接送', type: 'transport', price: 60, description: '30公里范围内专业宠物接送服务' }
+      addonServices.find(s => s.id === 's001')!,
+      addonServices.find(s => s.id === 's003')!
     ],
     status: 'care',
     paymentStatus: 'paid',
@@ -71,6 +75,7 @@ export const orders: Order[] = [
     ],
     specialNotes: '豆豆每天需要至少1小时的户外活动时间，饮食上请避开鸡肉类食物',
     cageNumber: 'A-12',
+    contactPhone: '138****5678',
     createdAt: '2026-06-15 14:30:00',
     confirmedAt: '2026-06-15 16:00:00',
     checkinTime: '2026-06-18 10:30:00'
@@ -79,12 +84,14 @@ export const orders: Order[] = [
     id: 'o002',
     orderNo: 'FY20260620001',
     roomId: 'r005',
+    room: rooms.find(r => r.id === 'r005'),
     petIds: ['p002'],
+    pets: pets.filter(p => ['p002'].includes(p.id)),
     checkinDate: '2026-06-20',
     checkoutDate: '2026-06-25',
     nights: 5,
     addonServices: [
-      { id: 's006', name: '宠物摄像', type: 'other', price: 50, description: '每日高清视频通话2次，实时了解爱宠状态' }
+      addonServices.find(s => s.id === 's006')!
     ],
     status: 'confirmed',
     paymentStatus: 'deposit',
@@ -97,6 +104,7 @@ export const orders: Order[] = [
       { id: 'f7', name: '押金', amount: 200, quantity: 1, unit: '' }
     ],
     specialNotes: '咪咪比较胆小，刚入住时可能会躲起来，请不要强行抱她',
+    contactPhone: '138****5678',
     createdAt: '2026-06-17 09:20:00',
     confirmedAt: '2026-06-17 10:00:00'
   },
@@ -104,12 +112,14 @@ export const orders: Order[] = [
     id: 'o003',
     orderNo: 'FY20260605001',
     roomId: 'r001',
+    room: rooms.find(r => r.id === 'r001'),
     petIds: ['p003'],
+    pets: pets.filter(p => ['p003'].includes(p.id)),
     checkinDate: '2026-06-05',
     checkoutDate: '2026-06-10',
     nights: 5,
     addonServices: [
-      { id: 's002', name: '精致SPA', type: 'grooming', price: 168, description: '药浴护理、深层清洁、精油按摩、造型修剪' }
+      addonServices.find(s => s.id === 's002')!
     ],
     status: 'completed',
     paymentStatus: 'refunded',
@@ -122,6 +132,7 @@ export const orders: Order[] = [
       { id: 'f10', name: '押金', amount: 200, quantity: 1, unit: '' }
     ],
     specialNotes: '球球精力旺盛，请多陪他玩耍，注意收好贵重物品',
+    contactPhone: '138****5678',
     checkinTime: '2026-06-05 11:00:00',
     checkoutTime: '2026-06-10 15:30:00',
     createdAt: '2026-06-01 16:45:00',

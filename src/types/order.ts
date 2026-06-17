@@ -37,6 +37,7 @@ export interface Order {
   paidAmount: number;
   feeDetails: FeeDetail[];
   specialNotes: string;
+  contactPhone: string;
   checkinTime?: string;
   checkoutTime?: string;
   cageNumber?: string;

@@ -1,46 +1,17 @@
 import React, { useMemo } from 'react';
-import { View, Text, Button, Image } from '@tarojs/components';
+import { View, Text, Button, Image, ScrollView } from '@tarojs/components';
 import Taro, { useRouter } from '@tarojs/taro';
 import styles from './index.module.scss';
 import classnames from 'classnames';
 import { pets } from '@/data/pets';
+import type { Pet, VaccineRecord } from '@/types/pet';
 import dayjs from 'dayjs';
-
-const fosterHistory = [
-  {
-    id: 'h1',
-    month: '01月',
-    day: '05-10',
-    room: '豪华观景房',
-    nights: 5,
-    rating: 5,
-    comment: '豆豆玩得很开心，下次还来！'
-  },
-  {
-    id: 'h2',
-    month: '12月',
-    day: '20-25',
-    room: '温馨家庭间',
-    nights: 5,
-    rating: 5,
-    comment: '照护非常细心，每天都有照片反馈'
-  },
-  {
-    id: 'h3',
-    month: '11月',
-    day: '10-15',
-    room: '舒适标准间',
-    nights: 5,
-    rating: 4,
-    comment: '整体满意，下次还会选择'
-  }
-];
 
 const PetDetailPage: React.FC = () => {
   const router = useRouter();
   const petId = router.params.id;
 
-  const pet = useMemo(() => pets.find((p) => p.id === petId) || pets[0], [petId]);
+  const pet = useMemo<Pet>(() => pets.find((p) => p.id === petId) || pets[0], [petId]);
 
   const handleBack = () => {
     Taro.navigateBack();
@@ -52,20 +23,40 @@ const PetDetailPage: React.FC = () => {
 
   const handleBook = () => {
     Taro.switchTab({
-      url: '/pages/booking/index',
-      success: () => {
-        Taro.showToast({ title: '已选择此宠物', icon: 'none' });
-      }
+      url: '/pages/booking/index'
     });
   };
 
-  const getVaccineStatus = (nextDate?: string) => {
-    if (!nextDate) return 'normal';
-    const diff = dayjs(nextDate).diff(dayjs(), 'day');
-    if (diff < 0) return 'expired';
-    if (diff <= 30) return 'soon';
-    return 'normal';
+  const getVaccineStatusText = (status: string) => {
+    const map: Record<string, string> = {
+      completed: '✅ 已完成',
+      pending: '⏳ 待接种',
+      expired: '⚠️ 已过期'
+    };
+    return map[status] || status;
   };
+
+  const getVaccineStatusClass = (status: string) => {
+    const map: Record<string, string> = {
+      completed: styles.vaccineStatusCompleted,
+      pending: styles.vaccineStatusPending,
+      expired: styles.vaccineStatusExpired
+    };
+    return map[status] || '';
+  };
+
+  const personalityTags = useMemo(() => {
+    const text = pet.personality || '';
+    const tags = text.split(/[，,。.\s]+/).filter((t) => t.length > 0 && t.length <= 6);
+    return tags.slice(0, 6);
+  }, [pet.personality]);
+
+  const dietaryTags = useMemo(() => {
+    const text = pet.dietaryRestrictions || '';
+    if (!text) return [];
+    const tags = text.split(/[，,。.\s]+/).filter((t) => t.length > 0 && t.length <= 8);
+    return tags.slice(0, 6);
+  }, [pet.dietaryRestrictions]);
 
   return (
     <View className={styles.page}>
@@ -80,153 +71,202 @@ const PetDetailPage: React.FC = () => {
             <View className={styles.headerNameRow}>
               <Text className={styles.headerName}>{pet.name}</Text>
               <View className={styles.headerGender}>
-                {pet.gender === 'male' ? '♂' : '♀'}
+                <Text>{pet.gender === 'male' ? '♂' : '♀'}</Text>
               </View>
             </View>
             <Text className={styles.headerBreed}>{pet.breed}</Text>
             <View className={styles.headerMetaRow}>
-              <View className={styles.headerMeta}>🎂 {pet.age}岁</View>
-              <View className={styles.headerMeta}>⚖️ {pet.weight}kg</View>
+              <View className={styles.headerMeta}>
+                <Text>🎂 {pet.age}岁</Text>
+              </View>
+              <View className={styles.headerMeta}>
+                <Text>⚖️ {pet.weight}kg</Text>
+              </View>
             </View>
           </View>
         </View>
       </View>
 
-      <View className={styles.container}>
-        {/* 基本信息 */}
-        <View className={styles.card}>
-          <View className={styles.cardTitle}>
-            <Text>📋</Text>
-            <Text>基本信息</Text>
+      <ScrollView className={styles.scrollContainer} scrollY>
+        <View className={styles.container}>
+          {/* 基本信息 */}
+          <View className={styles.card}>
+            <View className={styles.cardTitle}>
+              <Text>📋</Text>
+              <Text>基本信息</Text>
+            </View>
+            <View className={styles.infoGrid}>
+              <View className={styles.infoItem}>
+                <Text className={styles.infoLabel}>宠物类型</Text>
+                <Text className={styles.infoValue}>
+                  {pet.type === 'dog' ? '🐕 狗狗' : pet.type === 'cat' ? '🐱 猫咪' : '🐾 其他'}
+                </Text>
+              </View>
+              <View className={styles.infoItem}>
+                <Text className={styles.infoLabel}>绝育情况</Text>
+                <Text className={styles.infoValue}>
+                  {pet.neutered ? '✅ 已绝育' : '⏳ 未绝育'}
+                </Text>
+              </View>
+              <View className={styles.infoItem}>
+                <Text className={styles.infoLabel}>疫苗状态</Text>
+                <Text className={styles.infoValue}>
+                  {pet.vaccineStatus === 'completed' ? '✅ 齐全' : '⚠️ 待补'}
+                </Text>
+              </View>
+              <View className={styles.infoItem}>
+                <Text className={styles.infoLabel}>出生日期</Text>
+                <Text className={styles.infoValue}>
+                  {dayjs(pet.birthday).format('YYYY-MM-DD')}
+                </Text>
+              </View>
+            </View>
+            {pet.medicalHistory && (
+              <View className={styles.medicalBox}>
+                <Text className={styles.medicalLabel}>🏥 病史记录</Text>
+                <Text className={styles.medicalText}>{pet.medicalHistory}</Text>
+              </View>
+            )}
           </View>
-          <View className={styles.infoGrid}>
-            <View className={styles.infoItem}>
-              <Text className={styles.infoLabel}>宠物类型</Text>
-              <Text className={styles.infoValue}>
-                {pet.type === 'dog' ? '🐕 狗狗' : pet.type === 'cat' ? '🐱 猫咪' : '🐾 其他'}
-              </Text>
-            </View>
-            <View className={styles.infoItem}>
-              <Text className={styles.infoLabel}>绝育情况</Text>
-              <Text className={styles.infoValue}>{pet.sterilized ? '✅ 已绝育' : '⏳ 未绝育'}</Text>
-            </View>
-            <View className={styles.infoItem}>
-              <Text className={styles.infoLabel}>疫苗状态</Text>
-              <Text className={styles.infoValue}>
-                {pet.vaccineStatus === 'completed' ? '✅ 齐全' : '⚠️ 待补'}
-              </Text>
-            </View>
-            <View className={styles.infoItem}>
-              <Text className={styles.infoLabel}>驱虫情况</Text>
-              <Text className={styles.infoValue}>{pet.dewormed ? '✅ 已驱虫' : '⏳ 待驱虫'}</Text>
-            </View>
-          </View>
-        </View>
 
-        {/* 疫苗记录 */}
-        <View className={styles.card}>
-          <View className={styles.cardTitle}>
-            <Text>💉</Text>
-            <Text>疫苗记录</Text>
-          </View>
-          <View className={styles.vaccineList}>
-            {pet.vaccines.map((v) => {
-              const status = getVaccineStatus(v.nextDate);
-              return (
-                <View
-                  key={v.id}
-                  className={classnames(
-                    styles.vaccineItem,
-                    status === 'expired' && styles.vaccineItemExpired,
-                    status === 'soon' && styles.vaccineItemSoon
-                  )}
-                >
-                  <View className={styles.vaccineLeft}>
-                    <Text className={styles.vaccineName}>{v.name}</Text>
-                    <Text className={styles.vaccineDate}>接种时间: {v.date}</Text>
-                    {v.nextDate && <Text className={styles.vaccineNext}>下次: {v.nextDate}</Text>}
+          {/* 疫苗记录 */}
+          <View className={styles.card}>
+            <View className={styles.cardTitle}>
+              <Text>💉</Text>
+              <Text>疫苗记录</Text>
+            </View>
+            <View className={styles.vaccineList}>
+              {pet.vaccines && pet.vaccines.length > 0 ? (
+                pet.vaccines.map((v: VaccineRecord) => (
+                  <View
+                    key={v.id}
+                    className={classnames(styles.vaccineItem, getVaccineStatusClass(v.status))}
+                  >
+                    <View className={styles.vaccineLeft}>
+                      <Text className={styles.vaccineName}>{v.name}</Text>
+                      <Text className={styles.vaccineDate}>接种时间: {v.date}</Text>
+                      {v.nextDate && (
+                        <Text className={styles.vaccineNext}>下次: {v.nextDate}</Text>
+                      )}
+                    </View>
+                    <View className={styles.vaccineRight}>
+                      <Text
+                        className={classnames(
+                          styles.vaccineStatus,
+                          v.status === 'completed' && styles.vaccineStatusCompleted,
+                          v.status === 'pending' && styles.vaccineStatusPending,
+                          v.status === 'expired' && styles.vaccineStatusExpired
+                        )}
+                      >
+                        {getVaccineStatusText(v.status)}
+                      </Text>
+                    </View>
                   </View>
+                ))
+              ) : (
+                <View className={styles.emptyBox}>
+                  <Text className={styles.emptyText}>暂无疫苗记录</Text>
                 </View>
-              );
-            })}
+              )}
+            </View>
+          </View>
+
+          {/* 饮食禁忌 */}
+          <View className={styles.card}>
+            <View className={styles.cardTitle}>
+              <Text>🚫</Text>
+              <Text>饮食禁忌</Text>
+            </View>
+            {pet.dietaryRestrictions ? (
+              <View>
+                <View className={styles.tagList}>
+                  {dietaryTags.length > 0 ? (
+                    dietaryTags.map((tag, i) => (
+                      <View key={i} className={classnames(styles.tagItem, styles.tagError)}>
+                        <Text>{tag}</Text>
+                      </View>
+                    ))
+                  ) : (
+                    <View className={classnames(styles.tagItem, styles.tagError)}>
+                      <Text>{pet.dietaryRestrictions}</Text>
+                    </View>
+                  )}
+                </View>
+                <View className={styles.dietDetailBox}>
+                  <Text className={styles.dietDetailText}>📝 {pet.dietaryRestrictions}</Text>
+                </View>
+              </View>
+            ) : (
+              <View className={styles.emptyBox}>
+                <Text className={styles.emptyText}>暂无特殊饮食禁忌，可正常喂养。</Text>
+              </View>
+            )}
+          </View>
+
+          {/* 性格备注 */}
+          <View className={styles.card}>
+            <View className={styles.cardTitle}>
+              <Text>💭</Text>
+              <Text>性格特点</Text>
+            </View>
+            {pet.personality ? (
+              <View>
+                {personalityTags.length > 0 && (
+                  <View className={styles.tagList}>
+                    {personalityTags.map((tag, i) => (
+                      <View key={i} className={styles.tagItem}>
+                        <Text>{tag}</Text>
+                      </View>
+                    ))}
+                  </View>
+                )}
+                <View className={styles.personalityBox}>
+                  <Text className={styles.personalityText}>
+                    💡 {pet.personality}
+                  </Text>
+                </View>
+              </View>
+            ) : (
+              <View className={styles.emptyBox}>
+                <Text className={styles.emptyText}>暂无性格备注</Text>
+              </View>
+            )}
+          </View>
+
+          {/* 主人信息 */}
+          <View className={styles.card}>
+            <View className={styles.cardTitle}>
+              <Text>👤</Text>
+              <Text>主人信息</Text>
+            </View>
+            <View className={styles.ownerInfo}>
+              <View className={styles.ownerRow}>
+                <Text className={styles.ownerLabel}>主人姓名</Text>
+                <Text className={styles.ownerValue}>{pet.ownerName}</Text>
+              </View>
+              <View className={styles.ownerRow}>
+                <Text className={styles.ownerLabel}>联系电话</Text>
+                <Text className={styles.ownerValue}>{pet.ownerPhone}</Text>
+              </View>
+              <View className={styles.ownerRow}>
+                <Text className={styles.ownerLabel}>建档时间</Text>
+                <Text className={styles.ownerValue}>
+                  {dayjs(pet.createdAt).format('YYYY年MM月DD日')}
+                </Text>
+              </View>
+            </View>
           </View>
         </View>
 
-        {/* 饮食禁忌 */}
-        <View className={styles.card}>
-          <View className={styles.cardTitle}>
-            <Text>🚫</Text>
-            <Text>饮食禁忌</Text>
-          </View>
-          {pet.dietRestrictions && pet.dietRestrictions.length > 0 ? (
-            <View className={styles.tagList}>
-              {pet.dietRestrictions.map((item, i) => (
-                <View key={i} className={classnames(styles.tagItem, styles.tagError)}>
-                  {item}
-                </View>
-              ))}
-            </View>
-          ) : (
-            <View className={styles.dietWarning}>
-              <Text className={styles.dietText}>暂无特殊饮食禁忌，可正常喂养。</Text>
-            </View>
-          )}
-        </View>
-
-        {/* 性格备注 */}
-        <View className={styles.card}>
-          <View className={styles.cardTitle}>
-            <Text>💭</Text>
-            <Text>性格特点</Text>
-          </View>
-          <View className={styles.tagList}>
-            {pet.personalityTags?.map((tag, i) => (
-              <View key={i} className={styles.tagItem}>
-                {tag}
-              </View>
-            ))}
-          </View>
-          {pet.notes && (
-            <View className={styles.personalityBox} style={{ marginTop: 16 }}>
-              <Text className={styles.personalityText}>📝 {pet.notes}</Text>
-            </View>
-          )}
-        </View>
-
-        {/* 寄养历史 */}
-        <View className={styles.card}>
-          <View className={styles.cardTitle}>
-            <Text>📅</Text>
-            <Text>寄养历史</Text>
-          </View>
-          {fosterHistory.map((h) => (
-            <View key={h.id} className={styles.historyItem}>
-              <View className={styles.historyDates}>
-                <Text className={styles.historyMonth}>{h.month}</Text>
-                <Text className={styles.historyDay}>{h.day.split('-')[0]}</Text>
-              </View>
-              <View className={styles.historyContent}>
-                <Text className={styles.historyRoom}>{h.room}</Text>
-                <Text className={styles.historyMeta}>共{h.nights}晚 · {h.comment}</Text>
-                <View className={styles.historyRating}>
-                  {Array.from({ length: h.rating }).map((_, i) => (
-                    <Text key={i} className={styles.historyStar}>
-                      ⭐
-                    </Text>
-                  ))}
-                </View>
-              </View>
-            </View>
-          ))}
-        </View>
-      </View>
+        <View className={styles.bottomSpace} />
+      </ScrollView>
 
       {/* 底部操作栏 */}
       <View className={styles.footer}>
-        <Button className={[styles.footerBtn, styles.footerBtnOutline]} onClick={handleEdit}>
+        <Button className={classnames(styles.footerBtn, styles.footerBtnOutline)} onClick={handleEdit}>
           编辑档案
         </Button>
-        <Button className={[styles.footerBtn, styles.footerBtnPrimary]} onClick={handleBook}>
+        <Button className={classnames(styles.footerBtn, styles.footerBtnPrimary)} onClick={handleBook}>
           立即寄养
         </Button>
       </View>

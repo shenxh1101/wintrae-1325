@@ -100,7 +100,7 @@ const OrderConfirmPage: React.FC = () => {
               <Text>入住日期</Text>
             </Text>
             <Text className={styles.dateValue}>
-              {dayjs(order.checkInDate).format('YYYY年MM月DD日')}
+              {dayjs(order.checkinDate).format('YYYY年MM月DD日')}
             </Text>
           </View>
           <View className={styles.dateRow}>
@@ -109,7 +109,7 @@ const OrderConfirmPage: React.FC = () => {
               <Text>离店日期</Text>
             </Text>
             <Text className={styles.dateValue}>
-              {dayjs(order.checkOutDate).format('YYYY年MM月DD日')}
+              {dayjs(order.checkoutDate).format('YYYY年MM月DD日')}
             </Text>
           </View>
           <View className={styles.dateRow}>
@@ -141,13 +141,13 @@ const OrderConfirmPage: React.FC = () => {
         </View>
 
         {/* 附加服务 */}
-        {order.addons && order.addons.length > 0 && (
+        {order.addonServices && order.addonServices.length > 0 && (
           <View className={styles.infoCard}>
             <View className={styles.cardTitle}>
               <Text>🎁</Text>
               <Text>附加服务</Text>
             </View>
-            {order.addons.map((addon) => (
+            {order.addonServices.map((addon) => (
               <View key={addon.id} className={styles.serviceItem}>
                 <View className={styles.serviceLeft}>
                   <View className={styles.serviceIcon}>
@@ -185,7 +185,7 @@ const OrderConfirmPage: React.FC = () => {
           <View className={styles.orderRow}>
             <Text className={styles.orderLabel}>押金状态</Text>
             <Text className={styles.orderValue}>
-              ¥{order.deposit.toFixed(2)}
+              ¥{order.depositAmount.toFixed(2)}
               <Text className={styles.depositBadge}>
                 <Text>🔒</Text>
                 <Text>离店退还</Text>
