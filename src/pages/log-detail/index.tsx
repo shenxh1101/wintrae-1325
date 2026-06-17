@@ -176,32 +176,60 @@ const LogDetailPage: React.FC = () => {
             <View className={styles.sectionTitle}>
               <Text>📷</Text>
               <Text>
-                照片视频记录 ({imageUrls.length}张
-                {videoUrls.length > 0 && ` · ${videoUrls.length}个视频`})
+                照片视频记录 ({imageUrls.length}张图
+                {videoUrls.length > 0 && ` · ${videoUrls.length}个视频`}
               </Text>
             </View>
             <View className={styles.photoGrid}>
-              {imageUrls.slice(0, 9).map((url, index) => (
+              {log.medias.slice(0, 9).map((media, index) => (
                 <View
-                  key={index}
+                  key={media.id}
                   className={styles.photoItem}
-                  onClick={() => handlePreviewPhoto(index)}
+                  onClick={() => {
+                    if (media.type === 'image') {
+                      const imgIndex = imageUrls.indexOf(media.url);
+                      handlePreviewPhoto(imgIndex >= 0 ? imgIndex : 0);
+                    } else if (media.type === 'video') {
+                      Taro.previewMedia({
+                        sources: [
+                          {
+                            url: media.url,
+                            type: 'video',
+                            poster: (media as any).poster || ''
+                          }
+                        ]
+                      });
+                    }
+                  }}
                 >
-                  <Image className={styles.photoImg} src={url} mode="aspectFill" />
-                  {index === 8 && imageUrls.length > 9 && (
+                  <Image
+                    className={styles.photoImg}
+                    src={
+                      media.type === 'video'
+                        ? (media as any).poster || media.url
+                        : media.url
+                    }
+                    mode="aspectFill"
+                  />
+                  {media.type === 'video' && (
+                    <View className={styles.videoPlayBtn}>
+                      <Text>▶</Text>
+                    </View>
+                  )}
+                  {index === 8 && log.medias.length > 9 && (
                     <View className={styles.photoCount}>
-                      <Text>+{imageUrls.length - 9}</Text>
+                      <Text>+{log.medias.length - 9}</Text>
                     </View>
                   )}
                 </View>
               ))}
             </View>
-            {imageUrls.length > 9 && (
+            {log.medias.length > 9 && (
               <View
-                className={[styles.actionBtn, styles.actionBtnOutline]}
+                className={classnames(styles.actionBtn, styles.actionBtnOutline)}
                 onClick={() => handlePreviewPhoto(0)}
               >
-                查看全部照片
+                查看全部
               </View>
             )}
           </View>

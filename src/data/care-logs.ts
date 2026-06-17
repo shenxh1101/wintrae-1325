@@ -52,7 +52,8 @@ export const careLogs: CareLog[] = [
     medias: [
       { id: 'm4', type: 'image', url: 'https://picsum.photos/id/1074/600/600' },
       { id: 'm5', type: 'image', url: 'https://picsum.photos/id/718/600/600' },
-      { id: 'm6', type: 'image', url: 'https://picsum.photos/id/1084/600/600' }
+      { id: 'm6', type: 'video', url: 'https://www.w3schools.com/html/mov_bbb.mp4', poster: 'https://picsum.photos/id/1084/600/600' },
+      { id: 'm6v', type: 'image', url: 'https://picsum.photos/id/1084/600/600' }
     ]
   },
   {
@@ -100,7 +101,10 @@ export const careLogs: CareLog[] = [
     timestamp: '2026-06-18 20:00:00',
     staffId: 'st001',
     staffName: '李护理',
-    medias: [],
+    medias: [
+      { id: 'm9', type: 'image', url: 'https://picsum.photos/id/237/600/600' },
+      { id: 'm10', type: 'video', url: 'https://www.w3schools.com/html/mov_bbb.mp4', poster: 'https://picsum.photos/id/1062/600/600' }
+    ],
     abnormalLevel: 'low',
     abnormalDetails: '腹部轻微红疹，无发烧，精神食欲正常',
     handled: true,

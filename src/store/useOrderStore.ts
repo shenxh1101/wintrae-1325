@@ -2,7 +2,7 @@ import { create } from 'zustand';
 import type { Order, AddonService } from '@/types/order';
 import { orders as mockOrders, addonServices } from '@/data/orders';
 import { rooms } from '@/data/rooms';
-import { pets } from '@/data/pets';
+import { usePetStore } from './usePetStore';
 
 interface OrderState {
   orders: Order[];
@@ -60,7 +60,10 @@ export const useOrderStore = create<OrderState>((set, get) => ({
   setSpecialNotes: (notes) => set({ specialNotes: notes }),
 
   getSelectedRoom: () => rooms.find((r) => r.id === get().selectedRoomId),
-  getSelectedPets: () => pets.filter((p) => get().selectedPetIds.includes(p.id)),
+  getSelectedPets: () => {
+    const petState = usePetStore.getState();
+    return petState.pets.filter((p) => get().selectedPetIds.includes(p.id));
+  },
   getSelectedAddons: () => addonServices.filter((s) => get().selectedAddonIds.includes(s.id)),
 
   calculateNights: () => {

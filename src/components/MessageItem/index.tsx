@@ -78,12 +78,15 @@ const MessageItem: React.FC<MessageItemProps> = ({ message, onClick }) => {
           )}
 
           {message.action && (
-            <Button className={styles.actionBtn} onClick={(e) => {
-              e.stopPropagation();
-              if (message.action?.target) {
-                Taro.navigateTo({ url: message.action.target });
-              }
-            }}>
+            <Button
+              className={styles.actionBtn}
+              onClick={(e) => {
+                e.stopPropagation();
+                if (onClick) {
+                  onClick(message);
+                }
+              }}
+            >
               {message.action.label}
             </Button>
           )}

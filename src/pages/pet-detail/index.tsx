@@ -3,15 +3,33 @@ import { View, Text, Button, Image, ScrollView } from '@tarojs/components';
 import Taro, { useRouter } from '@tarojs/taro';
 import styles from './index.module.scss';
 import classnames from 'classnames';
-import { pets } from '@/data/pets';
+import { usePetStore } from '@/store/usePetStore';
 import type { Pet, VaccineRecord } from '@/types/pet';
 import dayjs from 'dayjs';
 
 const PetDetailPage: React.FC = () => {
   const router = useRouter();
   const petId = router.params.id;
+  const { getPetById } = usePetStore();
 
-  const pet = useMemo<Pet>(() => pets.find((p) => p.id === petId) || pets[0], [petId]);
+  const pet = useMemo<Pet | undefined>(() => getPetById(petId || ''), [petId, getPetById]);
+
+  if (!pet) {
+    return (
+      <View className={styles.page}>
+        <View className={styles.header}>
+          <View className={styles.headerBack} onClick={() => Taro.navigateBack()}>
+            <Text className={styles.headerBackIcon}>‹</Text>
+          </View>
+        </View>
+        <View className={styles.emptyBox}>
+          <Text style={{ fontSize: '80rpx' }}>🐾</Text>
+          <Text style={{ fontSize: '32rpx', color: '#333', marginTop: '20rpx' }}>宠物不存在</Text>
+          <Text style={{ fontSize: '26rpx', color: '#999', marginTop: '12rpx' }}>该宠物档案可能已被删除</Text>
+        </View>
+      </View>
+    );
+  }
 
   const handleBack = () => {
     Taro.navigateBack();

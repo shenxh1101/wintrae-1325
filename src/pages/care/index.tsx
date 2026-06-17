@@ -260,29 +260,52 @@ const CarePage: React.FC = () => {
         {activeTab === 'photo' && filteredLogs.length > 0 ? (
           <View className={styles.photoGallery}>
             {filteredLogs.flatMap((log) =>
-              log.medias
-                .filter((m) => m.type === 'image')
-                .map((media, idx) => (
-                  <View
-                    key={`${log.id}-${media.id}`}
-                    className={styles.galleryItem}
-                    onClick={() => {
-                      const urls = log.medias.filter((m) => m.type === 'image').map((m) => m.url);
-                      const currentIndex = log.medias.findIndex((m) => m.id === media.id && m.type === 'image');
+              log.medias.map((media) => (
+                <View
+                  key={`${log.id}-${media.id}`}
+                  className={styles.galleryItem}
+                  onClick={() => {
+                    if (media.type === 'image') {
+                      const imageUrls = log.medias
+                        .filter((m) => m.type === 'image')
+                        .map((m) => m.url);
+                      const currentIndex = log.medias
+                        .filter((m) => m.type === 'image')
+                        .findIndex((m) => m.id === media.id);
                       Taro.previewImage({
                         current: currentIndex >= 0 ? currentIndex : 0,
-                        urls
+                        urls: imageUrls
                       });
-                    }}
-                  >
-                    <Image className={styles.galleryImg} src={media.url} mode="aspectFill" />
-                    <View className={styles.galleryInfo}>
-                      <Text className={styles.galleryTime}>
-                        {dayjs(log.timestamp).format('HH:mm')}
-                      </Text>
+                    } else if (media.type === 'video') {
+                      Taro.previewMedia({
+                        sources: [
+                          {
+                            url: media.url,
+                            type: 'video',
+                            poster: (media as any).poster || ''
+                          }
+                        ]
+                      });
+                    }
+                  }}
+                >
+                  <Image
+                    className={styles.galleryImg}
+                    src={media.type === 'video' ? (media as any).poster || media.url : media.url}
+                    mode="aspectFill"
+                  />
+                  {media.type === 'video' && (
+                    <View className={styles.galleryPlayBtn}>
+                      <Text>▶</Text>
                     </View>
+                  )}
+                  <View className={styles.galleryInfo}>
+                    <Text className={styles.galleryTime}>
+                      {dayjs(log.timestamp).format('HH:mm')}
+                    </Text>
                   </View>
-                ))
+                </View>
+              ))
             )}
           </View>
         ) : filteredLogs.length === 0 ? (

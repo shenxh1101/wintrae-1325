@@ -2,7 +2,8 @@ import React, { useMemo } from 'react';
 import { View, Text, Button, Image, ScrollView } from '@tarojs/components';
 import Taro, { useRouter } from '@tarojs/taro';
 import styles from './index.module.scss';
-import { orders } from '@/data/orders';
+import classnames from 'classnames';
+import { useOrderStore } from '@/store/useOrderStore';
 import dayjs from 'dayjs';
 
 const statusConfig: Record<string, {
@@ -55,38 +56,26 @@ const statusConfig: Record<string, {
   }
 };
 
-const serviceIcons: Record<string, string> = {
-  '基础洗护': '🛁',
-  '精致SPA': '💅',
-  '上门接送': '🚗',
-  '机场接送': '✈️',
-  '遛弯升级': '🐕',
-  '宠物摄像': '📹'
+const serviceTypeIcons: Record<string, string> = {
+  grooming: '🛁',
+  transport: '🚗',
+  medical: '💊',
+  other: '✨'
 };
 
 const OrderDetailPage: React.FC = () => {
   const router = useRouter();
   const orderId = router.params.id;
+  const { getOrderById } = useOrderStore();
 
-  const order = useMemo(() => orders.find((o) => o.id === orderId) || orders[0], [orderId]);
-  const status = statusConfig[order.status] || statusConfig.pending;
+  const order = useMemo(() => {
+    if (!orderId) return undefined;
+    return getOrderById(orderId);
+  }, [orderId, getOrderById]);
 
-  const steps = [
-    { label: '提交订单', time: order.createdAt, desc: '订单创建成功', done: true },
-    { label: '门店确认', time: order.confirmedAt || '--', desc: '等待门店确认', done: order.status !== 'pending' && order.status !== 'cancelled' },
-    {
-      label: '宠物入住',
-      time: order.checkinDate,
-      desc: '入住当天办理入住',
-      done: order.status === 'checkin' || order.status === 'care' || order.status === 'checkout' || order.status === 'completed'
-    },
-    {
-      label: '服务完成',
-      time: order.checkoutDate,
-      desc: '寄养服务完成，宠物回家',
-      done: order.status === 'completed'
-    }
-  ];
+  const handleBack = () => {
+    Taro.navigateBack();
+  };
 
   const handleCopy = (text: string) => {
     Taro.setClipboardData({
@@ -113,9 +102,10 @@ const OrderDetailPage: React.FC = () => {
   };
 
   const handlePay = () => {
+    if (!order) return;
     Taro.showModal({
       title: '模拟支付',
-      content: `确认支付 ¥${order.totalAmount.toFixed(2)}？`,
+      content: `确认支付 ¥${(order.totalAmount + order.depositAmount).toFixed(2)}？`,
       success: (res) => {
         if (res.confirm) {
           Taro.showToast({ title: '支付成功！', icon: 'success' });
@@ -132,15 +122,66 @@ const OrderDetailPage: React.FC = () => {
     Taro.switchTab({ url: '/pages/messages/index' });
   };
 
+  if (!order) {
+    return (
+      <View className={styles.page}>
+        <View className={styles.header}>
+          <View className={styles.headerBack} onClick={handleBack}>
+            <Text className={styles.headerBackIcon}>‹</Text>
+          </View>
+          <Text className={styles.headerTitle}>订单详情</Text>
+        </View>
+        <View className={styles.emptyBox}>
+          <Text style={{ fontSize: '80rpx' }}>📋</Text>
+          <Text style={{ fontSize: '32rpx', color: '#333', marginTop: '20rpx' }}>订单不存在</Text>
+          <Text style={{ fontSize: '26rpx', color: '#999', marginTop: '12rpx' }}>
+            该订单可能已被删除或不存在
+          </Text>
+          <Button className={styles.retryBtn} onClick={handleBack}>
+            返回上一页
+          </Button>
+        </View>
+      </View>
+    );
+  }
+
+  const status = statusConfig[order.status] || statusConfig.pending;
+
+  const steps = [
+    { label: '提交订单', time: order.createdAt, desc: '订单创建成功', done: true },
+    {
+      label: '门店确认',
+      time: order.confirmedAt || '--',
+      desc: '等待门店确认',
+      done: order.status !== 'pending' && order.status !== 'cancelled'
+    },
+    {
+      label: '宠物入住',
+      time: order.checkinDate,
+      desc: '入住当天办理入住',
+      done:
+        order.status === 'checkin' ||
+        order.status === 'care' ||
+        order.status === 'checkout' ||
+        order.status === 'completed'
+    },
+    {
+      label: '服务完成',
+      time: order.checkoutDate,
+      desc: '寄养服务完成，宠物回家',
+      done: order.status === 'completed'
+    }
+  ];
+
   const renderFooter = () => {
     switch (order.status) {
       case 'pending':
         return (
           <>
-            <Button className={[styles.footerBtn, styles.footerBtnOutline]} onClick={handleCancel}>
+            <Button className={classnames(styles.footerBtn, styles.footerBtnOutline)} onClick={handleCancel}>
               取消订单
             </Button>
-            <Button className={[styles.footerBtn, styles.footerBtnPrimary]} onClick={handlePay}>
+            <Button className={classnames(styles.footerBtn, styles.footerBtnPrimary)} onClick={handlePay}>
               立即支付
             </Button>
           </>
@@ -148,10 +189,10 @@ const OrderDetailPage: React.FC = () => {
       case 'confirmed':
         return (
           <>
-            <Button className={[styles.footerBtn, styles.footerBtnOutline]} onClick={handleContact}>
+            <Button className={classnames(styles.footerBtn, styles.footerBtnOutline)} onClick={handleContact}>
               联系门店
             </Button>
-            <Button className={[styles.footerBtn, styles.footerBtnPrimary]} onClick={handleCancel}>
+            <Button className={classnames(styles.footerBtn, styles.footerBtnPrimary)} onClick={handleCancel}>
               取消订单
             </Button>
           </>
@@ -161,10 +202,10 @@ const OrderDetailPage: React.FC = () => {
       case 'checkout':
         return (
           <>
-            <Button className={[styles.footerBtn, styles.footerBtnOutline]} onClick={handleContact}>
+            <Button className={classnames(styles.footerBtn, styles.footerBtnOutline)} onClick={handleContact}>
               联系门店
             </Button>
-            <Button className={[styles.footerBtn, styles.footerBtnSuccess]} onClick={handleCare}>
+            <Button className={classnames(styles.footerBtn, styles.footerBtnSuccess)} onClick={handleCare}>
               查看照护
             </Button>
           </>
@@ -172,17 +213,17 @@ const OrderDetailPage: React.FC = () => {
       case 'completed':
         return (
           <>
-            <Button className={[styles.footerBtn, styles.footerBtnOutline]} onClick={handleContact}>
+            <Button className={classnames(styles.footerBtn, styles.footerBtnOutline)} onClick={handleContact}>
               再次预约
             </Button>
-            <Button className={[styles.footerBtn, styles.footerBtnPrimary]} onClick={handleReview}>
+            <Button className={classnames(styles.footerBtn, styles.footerBtnPrimary)} onClick={handleReview}>
               去评价
             </Button>
           </>
         );
       default:
         return (
-          <Button className={[styles.footerBtn, styles.footerBtnPrimary]} onClick={handleContact}>
+          <Button className={classnames(styles.footerBtn, styles.footerBtnPrimary)} onClick={handleContact}>
             联系门店
           </Button>
         );
@@ -192,7 +233,7 @@ const OrderDetailPage: React.FC = () => {
   return (
     <View className={styles.page}>
       {/* 状态横幅 */}
-      <View className={[styles.statusBanner, status.bannerClass]}>
+      <View className={classnames(styles.statusBanner, status.bannerClass)}>
         <View className={styles.statusRow1}>
           <View>
             <Text className={styles.statusTitle}>{status.title}</Text>
@@ -200,7 +241,9 @@ const OrderDetailPage: React.FC = () => {
           </View>
           <Text className={styles.statusProgress}>{status.icon}</Text>
         </View>
-        <Text className={styles.statusDecor}>🐾</Text>
+        <View className={styles.statusDecor}>
+          <Text>🐾</Text>
+        </View>
       </View>
 
       {/* 进度条 */}
@@ -211,25 +254,25 @@ const OrderDetailPage: React.FC = () => {
             <View key={i} className={styles.progressItem}>
               {!isLast && (
                 <View
-                  className={[
+                  className={classnames(
                     styles.progressLine,
                     step.done && styles.progressLineActive
-                  ]}
+                  )}
                 />
               )}
               <View
-                className={[
+                className={classnames(
                   styles.progressIcon,
                   step.done && styles.progressIconActive
-                ]}
+                )}
               >
-                {step.done ? '✓' : i + 1}
+                <Text>{step.done ? '✓' : i + 1}</Text>
               </View>
               <Text
-                className={[
+                className={classnames(
                   styles.progressLabel,
                   step.done && styles.progressLabelActive
-                ]}
+                )}
               >
                 {step.label}
               </Text>
@@ -238,7 +281,7 @@ const OrderDetailPage: React.FC = () => {
         })}
       </View>
 
-      <ScrollView scrollY>
+      <ScrollView className={styles.scrollContainer} scrollY>
         <View className={styles.container}>
           {/* 房间信息 */}
           <View className={styles.card}>
@@ -252,9 +295,11 @@ const OrderDetailPage: React.FC = () => {
                 <View className={styles.roomDetail}>
                   <Text className={styles.roomName}>{order.room.name}</Text>
                   <Text className={styles.roomMeta}>
-                    {order.room.tags.slice(0, 2).join(' · ')}
+                    {order.room.size} · 可住{order.room.capacity}只
                   </Text>
-                  <Text className={styles.roomPrice}>¥{order.room.price}/晚 × {order.nights}晚</Text>
+                  <Text className={styles.roomPrice}>
+                    ¥{order.room.price}/晚 × {order.nights}晚
+                  </Text>
                 </View>
               </View>
             )}
@@ -296,17 +341,24 @@ const OrderDetailPage: React.FC = () => {
               <Text>🐾</Text>
               <Text>寄养宠物 ({order.pets?.length || 0}只)</Text>
             </View>
-            {order.pets && order.pets.map((pet) => (
-              <View key={pet.id} className={styles.petRow}>
-                <Image className={styles.petAvatar} src={pet.avatar} mode="aspectFill" />
-                <View className={styles.petDetail}>
-                  <Text className={styles.petName}>{pet.name}</Text>
-                  <Text className={styles.petMeta}>
-                    {pet.breed} · {pet.gender === 'male' ? '公' : '母'} · {pet.age}岁
-                  </Text>
+            {order.pets && order.pets.length > 0 ? (
+              order.pets.map((pet) => (
+                <View key={pet.id} className={styles.petRow}>
+                  <Image className={styles.petAvatar} src={pet.avatar} mode="aspectFill" />
+                  <View className={styles.petDetail}>
+                    <Text className={styles.petName}>{pet.name}</Text>
+                    <Text className={styles.petMeta}>
+                      {pet.breed} · {pet.gender === 'male' ? '公' : '母'} · {pet.age}岁 ·{' '}
+                      {pet.weight}kg
+                    </Text>
+                  </View>
                 </View>
+              ))
+            ) : (
+              <View className={styles.emptyTip}>
+                <Text>暂无宠物信息</Text>
               </View>
-            ))}
+            )}
           </View>
 
           {/* 附加服务 */}
@@ -320,7 +372,7 @@ const OrderDetailPage: React.FC = () => {
                 <View key={a.id} className={styles.serviceRow}>
                   <View className={styles.serviceLeft}>
                     <View className={styles.serviceIcon}>
-                      {serviceIcons[a.name] || '✨'}
+                      <Text>{serviceTypeIcons[a.type] || '✨'}</Text>
                     </View>
                     <Text className={styles.serviceName}>{a.name}</Text>
                   </View>
@@ -330,21 +382,40 @@ const OrderDetailPage: React.FC = () => {
             </View>
           )}
 
+          {/* 特殊备注 */}
+          {order.specialNotes && (
+            <View className={styles.card}>
+              <View className={styles.cardTitle}>
+                <Text>📝</Text>
+                <Text>特殊备注</Text>
+              </View>
+              <Text className={styles.notesText}>{order.specialNotes}</Text>
+            </View>
+          )}
+
           {/* 费用明细 */}
           <View className={styles.card}>
             <View className={styles.cardTitle}>
               <Text>💰</Text>
               <Text>费用明细</Text>
             </View>
-            {order.feeDetails.map((f) => (
-              <View key={f.id} className={styles.feeRow}>
-                <Text className={styles.feeLabel}>
-                  {f.name}
-                  {f.quantity > 1 && <Text className={styles.feeQty}> × {f.quantity}{f.unit}</Text>}
-                </Text>
-                <Text className={styles.feeValue}>¥{f.amount.toFixed(2)}</Text>
+            {order.feeDetails && order.feeDetails.length > 0 ? (
+              order.feeDetails.map((f) => (
+                <View key={f.id} className={styles.feeRow}>
+                  <Text className={styles.feeLabel}>
+                    {f.name}
+                    {f.quantity && f.quantity > 1 && (
+                      <Text className={styles.feeQty}> × {f.quantity}{f.unit || ''}</Text>
+                    )}
+                  </Text>
+                  <Text className={styles.feeValue}>¥{f.amount.toFixed(2)}</Text>
+                </View>
+              ))
+            ) : (
+              <View className={styles.emptyTip}>
+                <Text>暂无费用明细</Text>
               </View>
-            ))}
+            )}
             <View className={styles.feeTotalRow}>
               <Text className={styles.feeTotalLabel}>实付总计</Text>
               <Text className={styles.feeTotalValue}>¥{order.totalAmount.toFixed(2)}</Text>
@@ -354,7 +425,9 @@ const OrderDetailPage: React.FC = () => {
                 <Text className={styles.depositIcon}>🔒</Text>
                 <Text className={styles.depositText}>押金 ¥{order.depositAmount.toFixed(2)}</Text>
               </View>
-              <View className={styles.depositStatus}>离店原路退还</View>
+              <View className={styles.depositStatus}>
+                <Text>离店原路退还</Text>
+              </View>
             </View>
           </View>
 
@@ -367,8 +440,8 @@ const OrderDetailPage: React.FC = () => {
             <View className={styles.orderNoRow}>
               <Text className={styles.orderNoLabel}>订单编号</Text>
               <Text className={styles.orderNoValue} onClick={() => handleCopy(order.orderNo)}>
-                {order.orderNo}
-                <Text>📋</Text>
+                <Text>{order.orderNo}</Text>
+                <Text> 📋</Text>
               </Text>
             </View>
             <View className={styles.orderNoRow}>
@@ -379,14 +452,8 @@ const OrderDetailPage: React.FC = () => {
             </View>
             <View className={styles.orderNoRow}>
               <Text className={styles.orderNoLabel}>联系电话</Text>
-              <Text className={styles.infoValue}>{order.contactPhone}</Text>
+              <Text className={styles.infoValue}>{order.contactPhone || '--'}</Text>
             </View>
-            {order.specialNotes && (
-              <View className={styles.orderNoRow}>
-                <Text className={styles.orderNoLabel}>特殊备注</Text>
-                <Text className={styles.infoValue}>{order.specialNotes}</Text>
-              </View>
-            )}
           </View>
 
           {/* 订单时间轴 */}
@@ -399,14 +466,18 @@ const OrderDetailPage: React.FC = () => {
               {steps.map((step, i) => (
                 <View key={i} className={styles.timeItem}>
                   <View
-                    className={[
+                    className={classnames(
                       styles.timeDot,
                       !step.done && styles.timeDotPending
-                    ]}
+                    )}
                   />
                   <View className={styles.timeContent}>
                     <Text className={styles.timeTitle}>{step.label}</Text>
-                    <Text className={styles.timeDate}>{step.time}</Text>
+                    <Text className={styles.timeDate}>
+                      {dayjs(step.time).isValid()
+                        ? dayjs(step.time).format('YYYY-MM-DD HH:mm')
+                        : step.time}
+                    </Text>
                     <Text className={styles.timeDesc}>{step.desc}</Text>
                   </View>
                 </View>
@@ -414,6 +485,7 @@ const OrderDetailPage: React.FC = () => {
             </View>
           </View>
         </View>
+        <View className={styles.bottomSpace} />
       </ScrollView>
 
       {/* 底部操作栏 */}
@@ -423,9 +495,7 @@ const OrderDetailPage: React.FC = () => {
             <Text className={styles.footerLabel}>订单金额</Text>
             <Text className={styles.footerPrice}>¥{order.totalAmount.toFixed(2)}</Text>
           </View>
-          <View className={styles.footerButtons}>
-            {renderFooter()}
-          </View>
+          <View className={styles.footerButtons}>{renderFooter()}</View>
         </View>
       )}
     </View>

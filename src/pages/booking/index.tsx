@@ -6,9 +6,9 @@ import classnames from 'classnames';
 import PetCard from '@/components/PetCard';
 import Tag from '@/components/Tag';
 import { rooms } from '@/data/rooms';
-import { pets as allPets } from '@/data/pets';
 import { addonServices } from '@/data/orders';
 import { useOrderStore } from '@/store/useOrderStore';
+import { usePetStore } from '@/store/usePetStore';
 import type { Pet } from '@/types/pet';
 import type { AddonService } from '@/types/order';
 import dayjs from 'dayjs';
@@ -34,6 +34,7 @@ const BookingPage: React.FC = () => {
     calculateTotal,
     calculateNights
   } = useOrderStore();
+  const { pets: allPets } = usePetStore();
 
   const [notes, setNotes] = useState(specialNotes);
 
