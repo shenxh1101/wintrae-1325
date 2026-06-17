@@ -121,7 +121,8 @@ const BookingPage: React.FC = () => {
       Taro.showToast({ title: '请选择房型', icon: 'none' });
       return;
     }
-    if (selectedPetIds.length === 0) {
+    const validPetIds = selectedPetIds.filter((id) => allPets.some((p) => p.id === id));
+    if (validPetIds.length === 0) {
       Taro.showToast({ title: '请选择宠物', icon: 'none' });
       return;
     }
@@ -321,7 +322,7 @@ const BookingPage: React.FC = () => {
         <Button
           className={styles.submitBtn}
           onClick={handleSubmit}
-          disabled={!selectedRoomId || selectedPetIds.length === 0}
+          disabled={!selectedRoomId || selectedPetIds.filter((id) => allPets.some((p) => p.id === id)).length === 0}
         >
           提交预约
         </Button>

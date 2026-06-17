@@ -20,8 +20,12 @@ export const usePetStore = create<PetState>((set, get) => ({
     set((state) => ({
       pets: state.pets.map((p) => (p.id === id ? { ...p, ...data } : p))
     })),
-  deletePet: (id) =>
-    set((state) => ({ pets: state.pets.filter((p) => p.id !== id) })),
+  deletePet: (id) => {
+    set((state) => ({ pets: state.pets.filter((p) => p.id !== id) }));
+    import('./useOrderStore').then(({ useOrderStore }) => {
+      useOrderStore.getState().removeSelectedPetId(id);
+    });
+  },
   selectPet: (id) => set({ selectedPetId: id }),
   getPetById: (id) => get().pets.find((p) => p.id === id)
 }));

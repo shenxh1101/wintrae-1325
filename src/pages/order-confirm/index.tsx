@@ -26,7 +26,9 @@ const OrderConfirmPage: React.FC = () => {
     checkoutDate,
     specialNotes,
     getOrderById,
-    orders
+    orders,
+    createOrder,
+    resetBooking
   } = useOrderStore();
 
   const fromOrder = useMemo(() => {
@@ -34,7 +36,7 @@ const OrderConfirmPage: React.FC = () => {
       return getOrderById(orderId);
     }
     return undefined;
-  }, [orderId, getOrderById]);
+  }, [orderId, orders, getOrderById]);
 
   const room = fromOrder ? fromOrder.room : getSelectedRoom();
   const pets = fromOrder ? fromOrder.pets : getSelectedPets();
@@ -90,14 +92,32 @@ const OrderConfirmPage: React.FC = () => {
   };
 
   const handlePay = () => {
+    if (!room) {
+      Taro.showToast({ title: '房型信息异常', icon: 'none' });
+      return;
+    }
+    if (!pets || pets.length === 0) {
+      Taro.showToast({ title: '请至少选择一只宠物', icon: 'none' });
+      return;
+    }
     Taro.showModal({
       title: '模拟支付',
       content: `确认支付 ¥${(totalAmount + depositAmount).toFixed(2)}？`,
       success: (res) => {
         if (res.confirm) {
+          let newOrderId: string;
+          if (fromOrder) {
+            newOrderId = fromOrder.id;
+          } else {
+            const newOrder = createOrder();
+            newOrderId = newOrder.id;
+            resetBooking();
+          }
           Taro.showToast({ title: '支付成功！', icon: 'success' });
           setTimeout(() => {
-            Taro.switchTab({ url: '/pages/home/index' });
+            Taro.redirectTo({
+              url: `/pages/order-detail/index?id=${newOrderId}`
+            });
           }, 1500);
         }
       }
@@ -131,7 +151,7 @@ const OrderConfirmPage: React.FC = () => {
     });
   };
 
-  if (!room) {
+  if (!room || !pets || pets.length === 0) {
     return (
       <View className={styles.page}>
         <View className={styles.header}>
@@ -142,7 +162,9 @@ const OrderConfirmPage: React.FC = () => {
         </View>
         <View className={styles.emptyBox}>
           <Text style={{ fontSize: '80rpx' }}>📋</Text>
-          <Text style={{ fontSize: '32rpx', color: '#333', marginTop: '20rpx' }}>订单信息异常</Text>
+          <Text style={{ fontSize: '32rpx', color: '#333', marginTop: '20rpx' }}>
+            {!room ? '请先选择房型' : '请至少选择一只宠物'}
+          </Text>
           <Text style={{ fontSize: '26rpx', color: '#999', marginTop: '12rpx' }}>
             请返回预约页重新选择
           </Text>

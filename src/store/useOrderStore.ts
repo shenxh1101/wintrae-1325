@@ -27,11 +27,13 @@ interface OrderState {
   calculateNights: () => number;
   resetBooking: () => void;
   getOrderById: (id: string) => Order | undefined;
+  createOrder: () => Order;
   updateOrderDates: (orderId: string, checkin: string, checkout: string) => void;
   updateOrderAddons: (orderId: string, addonIds: string[]) => void;
   applyCancelOrder: (orderId: string, reason?: string) => void;
   contactStoreFromOrder: (orderId: string, content: string) => void;
   getActiveOrders: () => Order[];
+  removeSelectedPetId: (petId: string) => void;
 }
 
 const today = new Date();
@@ -134,6 +136,53 @@ export const useOrderStore = create<OrderState>((set, get) => ({
     }),
 
   getOrderById: (id) => get().orders.find((o) => o.id === id),
+
+  createOrder: () => {
+    const state = get();
+    const room = state.getSelectedRoom();
+    const pets = state.getSelectedPets();
+    const addons = state.getSelectedAddons();
+    const nights = state.calculateNights();
+    const totalAmount = state.calculateTotal();
+    const depositAmount = room ? room.price * 0.5 : 0;
+    const feeDetails = room
+      ? calculateFeeDetails(room, nights, addons, pets.length)
+      : [];
+
+    const now = dayjs();
+    const orderId = `order_${Date.now()}`;
+    const orderNo = 'FY' + now.format('YYYYMMDD') + String(state.orders.length + 1).padStart(3, '0');
+
+    const newOrder: Order = {
+      id: orderId,
+      orderNo,
+      roomId: state.selectedRoomId || '',
+      room: room as any,
+      petIds: state.selectedPetIds,
+      pets: pets as any,
+      checkinDate: state.checkinDate,
+      checkoutDate: state.checkoutDate,
+      nights,
+      addonServices: addons,
+      status: 'pending',
+      paymentStatus: 'unpaid',
+      depositAmount,
+      totalAmount,
+      paidAmount: 0,
+      feeDetails,
+      specialNotes: state.specialNotes,
+      contactPhone: '',
+      createdAt: now.format('YYYY-MM-DD HH:mm:ss')
+    };
+
+    set((s) => ({ orders: [newOrder, ...s.orders] }));
+    return newOrder;
+  },
+
+  removeSelectedPetId: (petId) =>
+    set((state) => ({
+      selectedPetIds: state.selectedPetIds.filter((id) => id !== petId)
+    })),
 
   getActiveOrders: () =>
     get().orders.filter((o) =>

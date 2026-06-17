@@ -66,13 +66,14 @@ const serviceTypeIcons: Record<string, string> = {
 const OrderDetailPage: React.FC = () => {
   const router = useRouter();
   const orderId = router.params.id;
+  const orders = useOrderStore((state) => state.orders);
   const { getOrderById, applyCancelOrder, contactStoreFromOrder, updateOrderDates, addonServices } =
     useOrderStore();
 
   const order = useMemo(() => {
     if (!orderId) return undefined;
     return getOrderById(orderId);
-  }, [orderId, getOrderById]);
+  }, [orderId, orders, getOrderById]);
 
   const handleBack = () => {
     Taro.navigateBack();
