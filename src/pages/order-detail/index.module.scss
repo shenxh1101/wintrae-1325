@@ -1,0 +1,512 @@
+@use '@/styles/variables.scss' as *;
+
+.page {
+  min-height: 100vh;
+  background-color: $color-bg-page;
+  padding-bottom: 200rpx;
+}
+
+// 状态横幅
+.statusBanner {
+  padding: $spacing-xl $page-padding;
+  background: linear-gradient(135deg, $color-primary 0%, $color-primary-light 100%);
+  color: $color-text-white;
+  position: relative;
+  overflow: hidden;
+}
+
+.statusBannerCompleted {
+  background: linear-gradient(135deg, $color-secondary 0%, $color-secondary-light 100%);
+}
+
+.statusBannerPending {
+  background: linear-gradient(135deg, $color-warning 0%, #FFB74D 100%);
+}
+
+.statusRow1 {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: $spacing-md;
+}
+
+.statusTitle {
+  font-size: $font-size-xl;
+  font-weight: $font-weight-bold;
+  margin-bottom: $spacing-xs;
+}
+
+.statusDesc {
+  font-size: $font-size-sm;
+  opacity: 0.95;
+}
+
+.statusProgress {
+  font-size: 56rpx;
+  opacity: 0.15;
+}
+
+.statusDecor {
+  position: absolute;
+  right: -10rpx;
+  bottom: -40rpx;
+  font-size: 280rpx;
+  opacity: 0.12;
+}
+
+// 进度条
+.progressBar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: $spacing-lg $page-padding;
+  background-color: $color-bg-card;
+  margin: 0 $page-padding;
+  margin-top: -$spacing-lg;
+  border-radius: $radius-lg;
+  box-shadow: $shadow-card;
+  position: relative;
+  z-index: 5;
+}
+
+.progressItem {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  flex: 1;
+  position: relative;
+}
+
+.progressIcon {
+  width: 56rpx;
+  height: 56rpx;
+  border-radius: $radius-round;
+  background-color: $color-bg-tag-green;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 24rpx;
+  margin-bottom: $spacing-xs;
+}
+
+.progressIconActive {
+  background: linear-gradient(135deg, $color-primary 0%, $color-primary-light 100%);
+  color: $color-text-white;
+  box-shadow: 0 2rpx 8rpx rgba(255, 140, 66, 0.3);
+}
+
+.progressLabel {
+  font-size: 22rpx;
+  color: $color-text-tertiary;
+  font-weight: $font-weight-medium;
+}
+
+.progressLabelActive {
+  color: $color-primary;
+  font-weight: $font-weight-semibold;
+}
+
+.progressLine {
+  position: absolute;
+  top: 28rpx;
+  left: calc(50% + 34rpx);
+  right: calc(-50% + 34rpx);
+  height: 2rpx;
+  background-color: $color-border;
+  z-index: -1;
+}
+
+.progressLineActive {
+  background: linear-gradient(90deg, $color-secondary 0%, $color-primary 100%);
+}
+
+.container {
+  padding: $spacing-lg $page-padding;
+}
+
+// 通用卡片
+.card {
+  background-color: $color-bg-card;
+  border-radius: $radius-lg;
+  padding: $spacing-lg;
+  margin-bottom: $spacing-md;
+  box-shadow: $shadow-card;
+}
+
+.cardTitle {
+  display: flex;
+  align-items: center;
+  gap: $spacing-sm;
+  font-size: $font-size-md;
+  font-weight: $font-weight-semibold;
+  color: $color-text-primary;
+  margin-bottom: $spacing-md;
+  padding-bottom: $spacing-md;
+  border-bottom: 1rpx solid $color-border;
+}
+
+// 房间信息
+.roomRow {
+  display: flex;
+  gap: $spacing-md;
+}
+
+.roomImg {
+  width: 180rpx;
+  height: 130rpx;
+  border-radius: $radius-md;
+  flex-shrink: 0;
+}
+
+.roomDetail {
+  flex: 1;
+  min-width: 0;
+}
+
+.roomName {
+  font-size: $font-size-md;
+  font-weight: $font-weight-semibold;
+  color: $color-text-primary;
+  margin-bottom: 8rpx;
+}
+
+.roomMeta {
+  font-size: $font-size-xs;
+  color: $color-text-tertiary;
+  margin-bottom: $spacing-sm;
+}
+
+.roomPrice {
+  font-size: $font-size-md;
+  font-weight: $font-weight-bold;
+  color: $color-primary;
+}
+
+// 日期行
+.infoRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: $spacing-sm 0;
+
+  &:not(:last-child) {
+    border-bottom: 1rpx solid $color-border;
+  }
+}
+
+.infoLabel {
+  font-size: $font-size-sm;
+  color: $color-text-secondary;
+}
+
+.infoValue {
+  font-size: $font-size-sm;
+  font-weight: $font-weight-medium;
+  color: $color-text-primary;
+}
+
+// 宠物列表
+.petRow {
+  display: flex;
+  align-items: center;
+  gap: $spacing-md;
+  padding: $spacing-md 0;
+
+  &:not(:last-child) {
+    border-bottom: 1rpx solid $color-border;
+    padding-bottom: $spacing-md;
+    margin-bottom: $spacing-xs;
+  }
+}
+
+.petAvatar {
+  width: 80rpx;
+  height: 80rpx;
+  border-radius: $radius-round;
+  flex-shrink: 0;
+}
+
+.petDetail {
+  flex: 1;
+}
+
+.petName {
+  font-size: $font-size-sm;
+  font-weight: $font-weight-medium;
+  color: $color-text-primary;
+  margin-bottom: 4rpx;
+}
+
+.petMeta {
+  font-size: $font-size-xs;
+  color: $color-text-tertiary;
+}
+
+// 附加服务
+.serviceRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: $spacing-md 0;
+
+  &:not(:last-child) {
+    border-bottom: 1rpx solid $color-border;
+  }
+}
+
+.serviceLeft {
+  display: flex;
+  align-items: center;
+  gap: $spacing-sm;
+}
+
+.serviceIcon {
+  width: 44rpx;
+  height: 44rpx;
+  border-radius: $radius-sm;
+  background-color: rgba(255, 140, 66, 0.1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 22rpx;
+}
+
+.serviceName {
+  font-size: $font-size-sm;
+  color: $color-text-primary;
+}
+
+.servicePrice {
+  font-size: $font-size-sm;
+  color: $color-text-secondary;
+}
+
+// 费用明细
+.feeRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: $spacing-sm 0;
+}
+
+.feeLabel {
+  font-size: $font-size-sm;
+  color: $color-text-secondary;
+}
+
+.feeValue {
+  font-size: $font-size-sm;
+  color: $color-text-primary;
+}
+
+.feeTotalRow {
+  padding-top: $spacing-md;
+  margin-top: $spacing-sm;
+  border-top: 1rpx dashed $color-border;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.feeTotalLabel {
+  font-size: $font-size-md;
+  font-weight: $font-weight-semibold;
+  color: $color-text-primary;
+}
+
+.feeTotalValue {
+  font-size: 40rpx;
+  font-weight: $font-weight-bold;
+  color: $color-primary;
+}
+
+// 押金状态
+.depositRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: $spacing-md;
+  background-color: rgba(124, 179, 66, 0.06);
+  border-radius: $radius-md;
+  margin-top: $spacing-md;
+}
+
+.depositLeft {
+  display: flex;
+  align-items: center;
+  gap: $spacing-sm;
+}
+
+.depositIcon {
+  font-size: 28rpx;
+}
+
+.depositText {
+  font-size: $font-size-sm;
+  color: $color-text-primary;
+  font-weight: $font-weight-medium;
+}
+
+.depositStatus {
+  padding: 4rpx 12rpx;
+  background-color: $color-bg-tag-green;
+  color: $color-secondary;
+  font-size: $font-size-xs;
+  font-weight: $font-weight-medium;
+  border-radius: $radius-xs;
+}
+
+// 订单信息
+.orderNoRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: $spacing-sm 0;
+}
+
+.orderNoLabel {
+  font-size: $font-size-sm;
+  color: $color-text-secondary;
+}
+
+.orderNoValue {
+  font-size: $font-size-sm;
+  color: $color-primary;
+  display: inline-flex;
+  align-items: center;
+  gap: 6rpx;
+}
+
+// 操作栏
+.footer {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background-color: $color-bg-card;
+  padding: $spacing-md $page-padding;
+  padding-bottom: calc(#{$spacing-md} + env(safe-area-inset-bottom));
+  display: flex;
+  align-items: center;
+  gap: $spacing-md;
+  box-shadow: 0 -4rpx 16rpx rgba(0, 0, 0, 0.06);
+  z-index: 100;
+}
+
+.footerInfo {
+  flex: 1;
+}
+
+.footerLabel {
+  font-size: 22rpx;
+  color: $color-text-tertiary;
+  margin-bottom: 4rpx;
+}
+
+.footerPrice {
+  font-size: 36rpx;
+  font-weight: $font-weight-bold;
+  color: $color-primary;
+}
+
+.footerButtons {
+  display: flex;
+  gap: $spacing-sm;
+}
+
+.footerBtn {
+  @include button-reset;
+  height: $button-height-lg;
+  padding: 0 $spacing-xl;
+  border-radius: $radius-button;
+  font-size: $font-size-sm;
+  font-weight: $font-weight-semibold;
+  transition: all $transition-base;
+
+  &:active {
+    transform: scale(0.98);
+    opacity: 0.95;
+  }
+}
+
+.footerBtnOutline {
+  background-color: $color-bg-hover;
+  color: $color-text-secondary;
+}
+
+.footerBtnPrimary {
+  background: linear-gradient(135deg, $color-primary 0%, $color-primary-light 100%);
+  color: $color-text-white;
+  box-shadow: 0 4rpx 16rpx rgba(255, 140, 66, 0.3);
+}
+
+.footerBtnSuccess {
+  background: linear-gradient(135deg, $color-secondary 0%, $color-secondary-light 100%);
+  color: $color-text-white;
+  box-shadow: 0 4rpx 16rpx rgba(124, 179, 66, 0.3);
+}
+
+// 时间轴节点
+.timeLine {
+  padding: $spacing-sm 0;
+}
+
+.timeItem {
+  display: flex;
+  gap: $spacing-md;
+  padding: $spacing-sm 0;
+  position: relative;
+}
+
+.timeDot {
+  width: 24rpx;
+  height: 24rpx;
+  border-radius: $radius-round;
+  background-color: $color-success;
+  margin-top: 8rpx;
+  flex-shrink: 0;
+  z-index: 1;
+}
+
+.timeDotPending {
+  background-color: $color-border;
+}
+
+.timeContent {
+  flex: 1;
+  padding-bottom: $spacing-sm;
+  border-bottom: 1rpx solid $color-border;
+  position: relative;
+
+  &:last-child {
+    border-bottom: none;
+  }
+}
+
+.timeTitle {
+  font-size: $font-size-sm;
+  font-weight: $font-weight-medium;
+  color: $color-text-primary;
+  margin-bottom: 4rpx;
+}
+
+.timeDate {
+  font-size: $font-size-xs;
+  color: $color-text-tertiary;
+}
+
+.timeDesc {
+  font-size: 22rpx;
+  color: $color-text-tertiary;
+  margin-top: 4rpx;
+}
+
+.timeLine::before {
+  content: '';
+  position: absolute;
+  left: 45rpx;
+  top: 40rpx;
+  bottom: 0;
+  width: 2rpx;
+  background-color: $color-border;
+}

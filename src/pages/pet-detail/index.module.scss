@@ -1,0 +1,347 @@
+@use '@/styles/variables.scss' as *;
+
+.page {
+  min-height: 100vh;
+  background-color: $color-bg-page;
+  padding-bottom: 180rpx;
+}
+
+// 头部头像区
+.header {
+  background: linear-gradient(135deg, $color-primary 0%, $color-primary-light 100%);
+  padding: $spacing-xl * 1.2 $page-padding;
+  padding-bottom: $spacing-xl * 2.5;
+  position: relative;
+}
+
+.headerBack {
+  width: 72rpx;
+  height: 72rpx;
+  background-color: rgba(255, 255, 255, 0.25);
+  border-radius: $radius-round;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: $spacing-lg;
+}
+
+.headerBackIcon {
+  font-size: 28rpx;
+  color: $color-text-white;
+  font-weight: $font-weight-bold;
+}
+
+.headerContent {
+  display: flex;
+  align-items: center;
+  gap: $spacing-lg;
+}
+
+.headerAvatar {
+  width: 180rpx;
+  height: 180rpx;
+  border-radius: $radius-xl;
+  border: 4rpx solid rgba(255, 255, 255, 0.4);
+  box-shadow: 0 8rpx 24rpx rgba(0, 0, 0, 0.15);
+}
+
+.headerInfo {
+  flex: 1;
+  color: $color-text-white;
+}
+
+.headerNameRow {
+  display: flex;
+  align-items: center;
+  gap: $spacing-sm;
+  margin-bottom: $spacing-sm;
+}
+
+.headerName {
+  font-size: 40rpx;
+  font-weight: $font-weight-bold;
+}
+
+.headerGender {
+  width: 40rpx;
+  height: 40rpx;
+  border-radius: $radius-round;
+  background-color: rgba(255, 255, 255, 0.25);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 22rpx;
+}
+
+.headerBreed {
+  font-size: $font-size-md;
+  opacity: 0.95;
+  margin-bottom: 6rpx;
+}
+
+.headerMetaRow {
+  display: flex;
+  gap: $spacing-md;
+  margin-top: $spacing-sm;
+}
+
+.headerMeta {
+  display: inline-flex;
+  align-items: center;
+  gap: 6rpx;
+  padding: 4rpx 12rpx;
+  background-color: rgba(255, 255, 255, 0.2);
+  border-radius: $radius-xs;
+  font-size: 22rpx;
+}
+
+.container {
+  padding: 0 $page-padding;
+  margin-top: -$spacing-xl * 1.5;
+  position: relative;
+  z-index: 5;
+}
+
+// 卡片通用样式
+.card {
+  background-color: $color-bg-card;
+  border-radius: $radius-lg;
+  padding: $spacing-lg;
+  margin-bottom: $spacing-md;
+  box-shadow: $shadow-card;
+}
+
+.cardTitle {
+  display: flex;
+  align-items: center;
+  gap: $spacing-sm;
+  font-size: $font-size-md;
+  font-weight: $font-weight-semibold;
+  color: $color-text-primary;
+  margin-bottom: $spacing-md;
+}
+
+// 基本信息网格
+.infoGrid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: $spacing-md;
+}
+
+.infoItem {
+  padding: $spacing-md;
+  background-color: $color-bg-page;
+  border-radius: $radius-md;
+}
+
+.infoLabel {
+  font-size: 22rpx;
+  color: $color-text-tertiary;
+  margin-bottom: 6rpx;
+}
+
+.infoValue {
+  font-size: $font-size-md;
+  font-weight: $font-weight-semibold;
+  color: $color-text-primary;
+}
+
+// 疫苗记录
+.vaccineList {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-sm;
+}
+
+.vaccineItem {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: $spacing-md;
+  background-color: $color-bg-page;
+  border-radius: $radius-md;
+  border-left: 6rpx solid $color-success;
+}
+
+.vaccineItemExpired {
+  border-left-color: $color-error;
+}
+
+.vaccineItemSoon {
+  border-left-color: $color-warning;
+}
+
+.vaccineLeft {
+  flex: 1;
+}
+
+.vaccineName {
+  font-size: $font-size-sm;
+  font-weight: $font-weight-medium;
+  color: $color-text-primary;
+  margin-bottom: 4rpx;
+}
+
+.vaccineDate {
+  font-size: 22rpx;
+  color: $color-text-tertiary;
+}
+
+.vaccineNext {
+  font-size: 22rpx;
+  color: $color-warning;
+  margin-top: 4rpx;
+}
+
+// 标签组
+.tagList {
+  display: flex;
+  flex-wrap: wrap;
+  gap: $spacing-sm;
+}
+
+.tagItem {
+  padding: 8rpx 16rpx;
+  background-color: rgba(124, 179, 66, 0.1);
+  color: $color-secondary;
+  font-size: $font-size-xs;
+  border-radius: $radius-xs;
+}
+
+.tagWarning {
+  background-color: rgba(255, 193, 7, 0.1);
+  color: $color-warning;
+}
+
+.tagError {
+  background-color: rgba(244, 67, 54, 0.1);
+  color: $color-error;
+}
+
+// 饮食禁忌
+.dietWarning {
+  padding: $spacing-md;
+  background-color: rgba(244, 67, 54, 0.04);
+  border-radius: $radius-md;
+  border: 1rpx dashed rgba(244, 67, 54, 0.2);
+}
+
+.dietText {
+  font-size: $font-size-sm;
+  color: $color-text-secondary;
+  line-height: $line-height-normal;
+}
+
+// 性格备注
+.personalityBox {
+  padding: $spacing-md;
+  background-color: rgba(255, 140, 66, 0.04);
+  border-radius: $radius-md;
+}
+
+.personalityText {
+  font-size: $font-size-sm;
+  color: $color-text-secondary;
+  line-height: $line-height-normal;
+}
+
+// 寄养历史
+.historyItem {
+  display: flex;
+  gap: $spacing-md;
+  padding: $spacing-md 0;
+
+  &:not(:last-child) {
+    border-bottom: 1rpx solid $color-border;
+  }
+}
+
+.historyDates {
+  width: 100rpx;
+  flex-shrink: 0;
+  text-align: center;
+  padding: $spacing-sm 0;
+  background-color: rgba(124, 179, 66, 0.08);
+  border-radius: $radius-sm;
+}
+
+.historyMonth {
+  font-size: 22rpx;
+  color: $color-secondary;
+  font-weight: $font-weight-semibold;
+}
+
+.historyDay {
+  font-size: $font-size-lg;
+  font-weight: $font-weight-bold;
+  color: $color-text-primary;
+}
+
+.historyContent {
+  flex: 1;
+  min-width: 0;
+}
+
+.historyRoom {
+  font-size: $font-size-sm;
+  font-weight: $font-weight-medium;
+  color: $color-text-primary;
+  margin-bottom: 4rpx;
+}
+
+.historyMeta {
+  font-size: 22rpx;
+  color: $color-text-tertiary;
+}
+
+.historyRating {
+  display: flex;
+  gap: 4rpx;
+  margin-top: 8rpx;
+}
+
+.historyStar {
+  font-size: 22rpx;
+  color: #FFC107;
+}
+
+// 底部操作栏
+.footer {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background-color: $color-bg-card;
+  padding: $spacing-md $page-padding;
+  padding-bottom: calc(#{$spacing-md} + env(safe-area-inset-bottom));
+  display: flex;
+  gap: $spacing-md;
+  box-shadow: 0 -4rpx 16rpx rgba(0, 0, 0, 0.06);
+  z-index: 100;
+}
+
+.footerBtn {
+  @include button-reset;
+  flex: 1;
+  height: $button-height-lg;
+  border-radius: $radius-button;
+  font-size: $font-size-sm;
+  font-weight: $font-weight-semibold;
+  transition: all $transition-base;
+
+  &:active {
+    transform: scale(0.98);
+    opacity: 0.95;
+  }
+}
+
+.footerBtnOutline {
+  background-color: $color-bg-hover;
+  color: $color-text-secondary;
+}
+
+.footerBtnPrimary {
+  background: linear-gradient(135deg, $color-primary 0%, $color-primary-light 100%);
+  color: $color-text-white;
+  box-shadow: 0 4rpx 16rpx rgba(255, 140, 66, 0.3);
+}

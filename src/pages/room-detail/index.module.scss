@@ -1,0 +1,341 @@
+@use '@/styles/variables.scss' as *;
+
+.page {
+  min-height: 100vh;
+  background-color: $color-bg-page;
+  padding-bottom: 180rpx;
+}
+
+// 房间图片横幅
+.banner {
+  width: 100%;
+  height: 520rpx;
+  position: relative;
+}
+
+.bannerImg {
+  width: 100%;
+  height: 100%;
+}
+
+.bannerBack {
+  position: absolute;
+  top: $spacing-xl;
+  left: $spacing-xl;
+  width: 72rpx;
+  height: 72rpx;
+  background-color: rgba(255, 255, 255, 0.95);
+  border-radius: $radius-round;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: $shadow-card;
+  z-index: 10;
+}
+
+.bannerBackIcon {
+  font-size: 28rpx;
+  color: $color-text-primary;
+  font-weight: $font-weight-bold;
+}
+
+.bannerFav {
+  position: absolute;
+  top: $spacing-xl;
+  right: $spacing-xl;
+  width: 72rpx;
+  height: 72rpx;
+  background-color: rgba(255, 255, 255, 0.95);
+  border-radius: $radius-round;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: $shadow-card;
+  z-index: 10;
+}
+
+.bannerFavIcon {
+  font-size: 32rpx;
+}
+
+.bannerIndicator {
+  position: absolute;
+  bottom: $spacing-lg;
+  right: $spacing-xl;
+  padding: 6rpx 16rpx;
+  background-color: rgba(0, 0, 0, 0.5);
+  color: $color-text-white;
+  font-size: 22rpx;
+  border-radius: $radius-md;
+}
+
+.container {
+  padding: $spacing-lg $page-padding;
+  margin-top: -40rpx;
+  position: relative;
+  z-index: 5;
+}
+
+// 房间基本信息
+.infoCard {
+  background-color: $color-bg-card;
+  border-radius: $radius-xl;
+  padding: $spacing-xl;
+  margin-bottom: $spacing-lg;
+  box-shadow: $shadow-card;
+}
+
+.infoHeader {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  margin-bottom: $spacing-md;
+}
+
+.infoName {
+  flex: 1;
+  margin-right: $spacing-md;
+}
+
+.nameRow {
+  display: flex;
+  align-items: center;
+  gap: $spacing-sm;
+  margin-bottom: $spacing-sm;
+}
+
+.nameText {
+  font-size: 36rpx;
+  font-weight: $font-weight-bold;
+  color: $color-text-primary;
+}
+
+.tagsRow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: $spacing-sm;
+  margin-top: $spacing-sm;
+}
+
+.priceBox {
+  text-align: right;
+  flex-shrink: 0;
+}
+
+.priceLabel {
+  font-size: 20rpx;
+  color: $color-text-tertiary;
+  margin-bottom: 4rpx;
+}
+
+.priceValue {
+  font-size: 44rpx;
+  font-weight: $font-weight-bold;
+  color: $color-primary;
+  line-height: 1;
+}
+
+.priceUnit {
+  font-size: 24rpx;
+  color: $color-text-tertiary;
+  font-weight: $font-weight-normal;
+  margin-left: 4rpx;
+}
+
+.infoDesc {
+  font-size: $font-size-sm;
+  color: $color-text-secondary;
+  line-height: $line-height-normal;
+  padding: $spacing-md 0;
+  border-top: 1rpx solid $color-border;
+  margin-top: $spacing-md;
+}
+
+// 设施清单
+.sectionCard {
+  background-color: $color-bg-card;
+  border-radius: $radius-xl;
+  padding: $spacing-xl;
+  margin-bottom: $spacing-lg;
+  box-shadow: $shadow-card;
+}
+
+.sectionTitle {
+  font-size: $font-size-lg;
+  font-weight: $font-weight-semibold;
+  color: $color-text-primary;
+  margin-bottom: $spacing-lg;
+  display: flex;
+  align-items: center;
+  gap: $spacing-sm;
+}
+
+.facilitiesGrid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: $spacing-lg;
+}
+
+.facilityItem {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.facilityIcon {
+  width: 80rpx;
+  height: 80rpx;
+  border-radius: $radius-lg;
+  background-color: rgba(255, 140, 66, 0.08);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 36rpx;
+  margin-bottom: $spacing-sm;
+}
+
+.facilityName {
+  font-size: $font-size-xs;
+  color: $color-text-secondary;
+  text-align: center;
+}
+
+// 服务包含
+.serviceList {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-md;
+}
+
+.serviceItem {
+  display: flex;
+  align-items: center;
+  gap: $spacing-md;
+  padding: $spacing-md;
+  background-color: $color-bg-page;
+  border-radius: $radius-lg;
+}
+
+.serviceIcon {
+  width: 56rpx;
+  height: 56rpx;
+  border-radius: $radius-md;
+  background-color: rgba(124, 179, 66, 0.1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 28rpx;
+  flex-shrink: 0;
+}
+
+.serviceContent {
+  flex: 1;
+}
+
+.serviceTitle {
+  font-size: $font-size-sm;
+  font-weight: $font-weight-medium;
+  color: $color-text-primary;
+  margin-bottom: 4rpx;
+}
+
+.serviceDesc {
+  font-size: 22rpx;
+  color: $color-text-tertiary;
+}
+
+// 须知说明
+.noticeList {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-md;
+}
+
+.noticeItem {
+  display: flex;
+  align-items: flex-start;
+  gap: $spacing-md;
+  padding: $spacing-md 0;
+
+  &:not(:last-child) {
+    border-bottom: 1rpx solid $color-border;
+  }
+}
+
+.noticeNum {
+  width: 40rpx;
+  height: 40rpx;
+  border-radius: $radius-round;
+  background-color: rgba(255, 140, 66, 0.1);
+  color: $color-primary;
+  font-size: $font-size-xs;
+  font-weight: $font-weight-bold;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.noticeContent {
+  flex: 1;
+  font-size: $font-size-sm;
+  color: $color-text-secondary;
+  line-height: $line-height-normal;
+}
+
+// 底部操作栏
+.footer {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background-color: $color-bg-card;
+  padding: $spacing-md $page-padding;
+  padding-bottom: calc(#{$spacing-md} + env(safe-area-inset-bottom));
+  display: flex;
+  align-items: center;
+  gap: $spacing-md;
+  box-shadow: 0 -4rpx 16rpx rgba(0, 0, 0, 0.06);
+  z-index: 100;
+}
+
+.footerInfo {
+  flex: 1;
+}
+
+.footerPrice {
+  font-size: 32rpx;
+  font-weight: $font-weight-bold;
+  color: $color-primary;
+}
+
+.footerPriceUnit {
+  font-size: 22rpx;
+  color: $color-text-tertiary;
+  font-weight: $font-weight-normal;
+  margin-left: 4rpx;
+}
+
+.footerDesc {
+  font-size: 22rpx;
+  color: $color-text-tertiary;
+  margin-top: 4rpx;
+}
+
+.footerBtn {
+  @include button-reset;
+  height: $button-height-lg;
+  padding: 0 $spacing-xl * 1.5;
+  background: linear-gradient(135deg, $color-primary 0%, $color-primary-light 100%);
+  color: $color-text-white;
+  border-radius: $radius-button;
+  font-size: $font-size-md;
+  font-weight: $font-weight-semibold;
+  box-shadow: 0 4rpx 16rpx rgba(255, 140, 66, 0.3);
+  transition: all $transition-base;
+
+  &:active {
+    transform: scale(0.98);
+    opacity: 0.95;
+  }
+}

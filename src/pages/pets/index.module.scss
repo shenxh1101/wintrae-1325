@@ -1,0 +1,331 @@
+@use '@/styles/variables.scss' as *;
+
+.page {
+  min-height: 100vh;
+  background-color: $color-bg-page;
+  padding-bottom: 120rpx;
+}
+
+.container {
+  padding: $spacing-lg $page-padding;
+}
+
+// 头部统计卡片
+.statsCard {
+  background: linear-gradient(135deg, $color-secondary 0%, $color-secondary-light 100%);
+  border-radius: $radius-xl;
+  padding: $spacing-xl;
+  color: $color-text-white;
+  margin-bottom: $spacing-xl;
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 8rpx 24rpx rgba(124, 179, 66, 0.25);
+}
+
+.statsContent {
+  position: relative;
+  z-index: 1;
+}
+
+.statsTitle {
+  font-size: $font-size-xl;
+  font-weight: $font-weight-bold;
+  margin-bottom: $spacing-md;
+}
+
+.statsGrid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: $spacing-md;
+}
+
+.statItem {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.statNumber {
+  font-size: 40rpx;
+  font-weight: $font-weight-bold;
+  margin-bottom: 6rpx;
+}
+
+.statLabel {
+  font-size: $font-size-xs;
+  opacity: 0.9;
+}
+
+.statsDecor {
+  position: absolute;
+  right: -30rpx;
+  bottom: -30rpx;
+  font-size: 240rpx;
+  opacity: 0.12;
+}
+
+// Tab切换
+.tabs {
+  display: flex;
+  background-color: $color-bg-card;
+  border-radius: $radius-lg;
+  padding: 8rpx;
+  margin-bottom: $spacing-lg;
+  box-shadow: $shadow-card;
+}
+
+.tabItem {
+  flex: 1;
+  padding: $spacing-md 0;
+  text-align: center;
+  font-size: $font-size-md;
+  font-weight: $font-weight-medium;
+  color: $color-text-secondary;
+  border-radius: $radius-md;
+  transition: all $transition-fast;
+}
+
+.activeTab {
+  background: linear-gradient(135deg, $color-primary 0%, $color-primary-light 100%);
+  color: $color-text-white;
+  box-shadow: 0 2rpx 8rpx rgba(255, 140, 66, 0.3);
+}
+
+// 筛选提示
+.filterBar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: $spacing-md;
+}
+
+.filterTitle {
+  font-size: $font-size-lg;
+  font-weight: $font-weight-semibold;
+  color: $color-text-primary;
+}
+
+.filterCount {
+  font-size: $font-size-sm;
+  color: $color-text-tertiary;
+}
+
+// 宠物列表
+.petList {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-md;
+  margin-bottom: $spacing-xl;
+}
+
+// 疫苗提醒
+.vaccineSection {
+  margin-bottom: $spacing-xl;
+}
+
+.sectionTitle {
+  display: flex;
+  align-items: center;
+  gap: $spacing-sm;
+  font-size: $font-size-lg;
+  font-weight: $font-weight-semibold;
+  color: $color-text-primary;
+  margin-bottom: $spacing-md;
+}
+
+.vaccineCard {
+  background-color: $color-bg-card;
+  border-radius: $radius-lg;
+  padding: $spacing-lg;
+  margin-bottom: $spacing-md;
+  box-shadow: $shadow-card;
+  border-left: 6rpx solid $color-warning;
+}
+
+.vaccineHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: $spacing-md;
+}
+
+.vaccinePetInfo {
+  display: flex;
+  align-items: center;
+  gap: $spacing-md;
+}
+
+.vaccinePetAvatar {
+  width: 72rpx;
+  height: 72rpx;
+  border-radius: $radius-round;
+  border: 2rpx solid $color-border;
+}
+
+.vaccinePetName {
+  font-size: $font-size-md;
+  font-weight: $font-weight-semibold;
+  color: $color-text-primary;
+}
+
+.vaccinePetBreed {
+  font-size: $font-size-xs;
+  color: $color-text-tertiary;
+  margin-top: 4rpx;
+}
+
+.urgentBadge {
+  padding: 4rpx 12rpx;
+  background-color: rgba(244, 67, 54, 0.1);
+  color: $color-error;
+  font-size: 22rpx;
+  font-weight: $font-weight-medium;
+  border-radius: $radius-xs;
+}
+
+.vaccineDetail {
+  padding: $spacing-md;
+  background-color: $color-bg-page;
+  border-radius: $radius-md;
+}
+
+.vaccineItem {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8rpx 0;
+
+  &:not(:last-child) {
+    border-bottom: 1rpx dashed $color-border;
+    padding-bottom: 12rpx;
+    margin-bottom: 8rpx;
+  }
+}
+
+.vaccineName {
+  font-size: $font-size-sm;
+  color: $color-text-secondary;
+}
+
+.vaccineDate {
+  font-size: $font-size-sm;
+  font-weight: $font-weight-medium;
+  color: $color-warning;
+}
+
+.vaccineAction {
+  @include button-reset;
+  width: 100%;
+  height: $button-height-sm;
+  margin-top: $spacing-md;
+  background: linear-gradient(135deg, $color-primary 0%, $color-primary-light 100%);
+  color: $color-text-white;
+  border-radius: $radius-button;
+  font-size: $font-size-sm;
+  font-weight: $font-weight-medium;
+  transition: all $transition-base;
+
+  &:active {
+    opacity: 0.9;
+    transform: scale(0.98);
+  }
+}
+
+// 底部添加按钮
+.fab {
+  position: fixed;
+  bottom: calc(#{$spacing-xl} + env(safe-area-inset-bottom));
+  right: $page-padding;
+  width: 112rpx;
+  height: 112rpx;
+  border-radius: $radius-round;
+  background: linear-gradient(135deg, $color-primary 0%, $color-primary-light 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 8rpx 24rpx rgba(255, 140, 66, 0.4);
+  z-index: 100;
+  transition: all $transition-base;
+
+  &:active {
+    transform: scale(0.95);
+  }
+}
+
+.fabIcon {
+  font-size: 48rpx;
+  color: $color-text-white;
+  font-weight: $font-weight-bold;
+}
+
+// 空状态
+.emptyWrapper {
+  padding: $spacing-xl * 2 0;
+}
+
+// 健康概览
+.healthCard {
+  background-color: $color-bg-card;
+  border-radius: $radius-lg;
+  padding: $spacing-lg;
+  margin-bottom: $spacing-md;
+  box-shadow: $shadow-card;
+}
+
+.healthHeader {
+  display: flex;
+  align-items: center;
+  gap: $spacing-md;
+  margin-bottom: $spacing-lg;
+}
+
+.healthAvatar {
+  width: 80rpx;
+  height: 80rpx;
+  border-radius: $radius-round;
+  border: 2rpx solid $color-border;
+}
+
+.healthName {
+  font-size: $font-size-md;
+  font-weight: $font-weight-semibold;
+  color: $color-text-primary;
+  margin-bottom: 4rpx;
+}
+
+.healthMeta {
+  font-size: $font-size-xs;
+  color: $color-text-tertiary;
+}
+
+.healthStats {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: $spacing-sm;
+}
+
+.healthStat {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: $spacing-md $spacing-xs;
+  background-color: $color-bg-page;
+  border-radius: $radius-md;
+}
+
+.healthStatIcon {
+  font-size: 28rpx;
+  margin-bottom: 6rpx;
+}
+
+.healthStatValue {
+  font-size: $font-size-sm;
+  font-weight: $font-weight-semibold;
+  color: $color-text-primary;
+  margin-bottom: 4rpx;
+}
+
+.healthStatLabel {
+  font-size: 20rpx;
+  color: $color-text-tertiary;
+}

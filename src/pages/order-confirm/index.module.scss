@@ -1,0 +1,358 @@
+@use '@/styles/variables.scss' as *;
+
+.page {
+  min-height: 100vh;
+  background-color: $color-bg-page;
+  padding-bottom: 220rpx;
+}
+
+.container {
+  padding: $spacing-lg $page-padding;
+}
+
+// 订单状态横幅
+.statusBanner {
+  background: linear-gradient(135deg, $color-secondary 0%, $color-secondary-light 100%);
+  border-radius: $radius-xl;
+  padding: $spacing-xl;
+  color: $color-text-white;
+  margin-bottom: $spacing-lg;
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 8rpx 24rpx rgba(124, 179, 66, 0.2);
+}
+
+.statusIcon {
+  font-size: 72rpx;
+  margin-bottom: $spacing-sm;
+}
+
+.statusTitle {
+  font-size: $font-size-xl;
+  font-weight: $font-weight-bold;
+  margin-bottom: $spacing-xs;
+}
+
+.statusDesc {
+  font-size: $font-size-sm;
+  opacity: 0.9;
+}
+
+.statusDecor {
+  position: absolute;
+  right: -20rpx;
+  bottom: -20rpx;
+  font-size: 220rpx;
+  opacity: 0.15;
+}
+
+// 信息卡片
+.infoCard {
+  background-color: $color-bg-card;
+  border-radius: $radius-lg;
+  padding: $spacing-lg;
+  margin-bottom: $spacing-md;
+  box-shadow: $shadow-card;
+}
+
+.cardTitle {
+  display: flex;
+  align-items: center;
+  gap: $spacing-sm;
+  font-size: $font-size-md;
+  font-weight: $font-weight-semibold;
+  color: $color-text-primary;
+  margin-bottom: $spacing-md;
+  padding-bottom: $spacing-md;
+  border-bottom: 1rpx solid $color-border;
+}
+
+// 房间信息
+.roomInfo {
+  display: flex;
+  gap: $spacing-md;
+}
+
+.roomImg {
+  width: 160rpx;
+  height: 120rpx;
+  border-radius: $radius-md;
+  flex-shrink: 0;
+}
+
+.roomDetail {
+  flex: 1;
+  min-width: 0;
+}
+
+.roomName {
+  font-size: $font-size-md;
+  font-weight: $font-weight-semibold;
+  color: $color-text-primary;
+  margin-bottom: 8rpx;
+}
+
+.roomMeta {
+  font-size: $font-size-xs;
+  color: $color-text-tertiary;
+  margin-bottom: $spacing-sm;
+}
+
+.roomPrice {
+  font-size: $font-size-md;
+  font-weight: $font-weight-bold;
+  color: $color-primary;
+}
+
+// 日期信息
+.dateRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: $spacing-md 0;
+
+  &:not(:last-child) {
+    border-bottom: 1rpx solid $color-border;
+  }
+}
+
+.dateLabel {
+  font-size: $font-size-sm;
+  color: $color-text-secondary;
+  display: flex;
+  align-items: center;
+  gap: $spacing-sm;
+}
+
+.dateValue {
+  font-size: $font-size-sm;
+  font-weight: $font-weight-medium;
+  color: $color-text-primary;
+}
+
+// 宠物列表
+.petItem {
+  display: flex;
+  align-items: center;
+  gap: $spacing-md;
+  padding: $spacing-md 0;
+
+  &:not(:last-child) {
+    border-bottom: 1rpx solid $color-border;
+  }
+}
+
+.petAvatar {
+  width: 72rpx;
+  height: 72rpx;
+  border-radius: $radius-round;
+  flex-shrink: 0;
+}
+
+.petInfo {
+  flex: 1;
+}
+
+.petName {
+  font-size: $font-size-sm;
+  font-weight: $font-weight-medium;
+  color: $color-text-primary;
+  margin-bottom: 4rpx;
+}
+
+.petMeta {
+  font-size: $font-size-xs;
+  color: $color-text-tertiary;
+}
+
+// 附加服务
+.serviceItem {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: $spacing-md 0;
+
+  &:not(:last-child) {
+    border-bottom: 1rpx solid $color-border;
+  }
+}
+
+.serviceLeft {
+  display: flex;
+  align-items: center;
+  gap: $spacing-md;
+}
+
+.serviceIcon {
+  width: 48rpx;
+  height: 48rpx;
+  border-radius: $radius-sm;
+  background-color: rgba(255, 140, 66, 0.1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 24rpx;
+}
+
+.serviceName {
+  font-size: $font-size-sm;
+  color: $color-text-primary;
+}
+
+.servicePrice {
+  font-size: $font-size-sm;
+  font-weight: $font-weight-medium;
+  color: $color-text-secondary;
+}
+
+// 订单信息
+.orderRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: $spacing-sm 0;
+}
+
+.orderLabel {
+  font-size: $font-size-sm;
+  color: $color-text-secondary;
+}
+
+.orderValue {
+  font-size: $font-size-sm;
+  color: $color-text-primary;
+}
+
+.copyable {
+  display: inline-flex;
+  align-items: center;
+  gap: 6rpx;
+  color: $color-primary;
+  font-size: $font-size-xs;
+  padding: 4rpx 12rpx;
+  background-color: rgba(255, 140, 66, 0.08);
+  border-radius: $radius-xs;
+}
+
+// 费用明细
+.feeRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: $spacing-sm 0;
+}
+
+.feeLabel {
+  font-size: $font-size-sm;
+  color: $color-text-secondary;
+}
+
+.feeValue {
+  font-size: $font-size-sm;
+  color: $color-text-primary;
+}
+
+.feeRowTotal {
+  padding-top: $spacing-md;
+  margin-top: $spacing-sm;
+  border-top: 1rpx dashed $color-border;
+}
+
+.feeLabelTotal {
+  font-size: $font-size-md;
+  font-weight: $font-weight-semibold;
+  color: $color-text-primary;
+}
+
+.feeValueTotal {
+  font-size: $font-size-xl;
+  font-weight: $font-weight-bold;
+  color: $color-primary;
+}
+
+.depositBadge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4rpx;
+  padding: 4rpx 12rpx;
+  background-color: $color-bg-tag-green;
+  color: $color-success;
+  font-size: 22rpx;
+  font-weight: $font-weight-medium;
+  border-radius: $radius-xs;
+  margin-left: $spacing-sm;
+}
+
+// 底部操作栏
+.footer {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background-color: $color-bg-card;
+  padding: $spacing-md $page-padding;
+  padding-bottom: calc(#{$spacing-md} + env(safe-area-inset-bottom));
+  display: flex;
+  align-items: center;
+  gap: $spacing-md;
+  box-shadow: 0 -4rpx 16rpx rgba(0, 0, 0, 0.06);
+  z-index: 100;
+}
+
+.footerInfo {
+  flex: 1;
+}
+
+.footerLabel {
+  font-size: $font-size-xs;
+  color: $color-text-tertiary;
+  margin-bottom: 4rpx;
+}
+
+.footerPrice {
+  font-size: 40rpx;
+  font-weight: $font-weight-bold;
+  color: $color-primary;
+}
+
+.footerPriceUnit {
+  font-size: 24rpx;
+  font-weight: $font-weight-normal;
+}
+
+.footerButtons {
+  display: flex;
+  gap: $spacing-sm;
+}
+
+.footerBtn {
+  @include button-reset;
+  height: $button-height-lg;
+  padding: 0 $spacing-xl;
+  border-radius: $radius-button;
+  font-size: $font-size-sm;
+  font-weight: $font-weight-semibold;
+  transition: all $transition-base;
+
+  &:active {
+    transform: scale(0.98);
+    opacity: 0.95;
+  }
+}
+
+.footerBtnOutline {
+  background-color: $color-bg-hover;
+  color: $color-text-secondary;
+}
+
+.footerBtnPrimary {
+  background: linear-gradient(135deg, $color-primary 0%, $color-primary-light 100%);
+  color: $color-text-white;
+  box-shadow: 0 4rpx 16rpx rgba(255, 140, 66, 0.3);
+}
+
+.footerBtnSuccess {
+  background: linear-gradient(135deg, $color-secondary 0%, $color-secondary-light 100%);
+  color: $color-text-white;
+  box-shadow: 0 4rpx 16rpx rgba(124, 179, 66, 0.3);
+}

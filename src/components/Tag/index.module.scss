@@ -1,0 +1,65 @@
+@use '@/styles/variables.scss' as *;
+
+.tag {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 4rpx 16rpx;
+  border-radius: $radius-sm;
+  font-size: $font-size-xs;
+  font-weight: $font-weight-medium;
+  white-space: nowrap;
+  line-height: 1.4;
+}
+
+.tagPrimary {
+  background-color: $color-primary-bg;
+  color: $color-primary;
+}
+
+.tagSuccess {
+  background-color: $color-bg-tag-green;
+  color: $color-success;
+}
+
+.tagInfo {
+  background-color: $color-bg-tag-blue;
+  color: $color-info;
+}
+
+.tagWarning {
+  background-color: rgba(255, 152, 0, 0.1);
+  color: $color-warning;
+}
+
+.tagError {
+  background-color: rgba(244, 67, 54, 0.1);
+  color: $color-error;
+}
+
+.tagDefault {
+  background-color: $color-bg-hover;
+  color: $color-text-secondary;
+}
+
+.tagOutline {
+  background-color: transparent;
+  border: 1rpx solid $color-border;
+  color: $color-text-secondary;
+}
+
+.tagOutlinePrimary {
+  background-color: transparent;
+  border: 1rpx solid $color-primary;
+  color: $color-primary;
+}
+
+.small {
+  padding: 2rpx 12rpx;
+  font-size: 20rpx;
+}
+
+.large {
+  padding: 8rpx 20rpx;
+  font-size: $font-size-sm;
+}

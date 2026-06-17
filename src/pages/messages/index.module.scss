@@ -1,0 +1,405 @@
+@use '@/styles/variables.scss' as *;
+
+.page {
+  min-height: 100vh;
+  background-color: $color-bg-page;
+  padding-bottom: 40rpx;
+}
+
+.container {
+  padding: $spacing-lg $page-padding;
+}
+
+// 顶部消息统计
+.statsBar {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: $spacing-md;
+  margin-bottom: $spacing-xl;
+}
+
+.statCard {
+  background-color: $color-bg-card;
+  border-radius: $radius-lg;
+  padding: $spacing-md;
+  text-align: center;
+  box-shadow: 0 1rpx 4rpx rgba(0, 0, 0, 0.04);
+  position: relative;
+}
+
+.statIcon {
+  font-size: 32rpx;
+  margin-bottom: 6rpx;
+}
+
+.statNumber {
+  font-size: 28rpx;
+  font-weight: $font-weight-bold;
+  color: $color-text-primary;
+  margin-bottom: 4rpx;
+}
+
+.statLabel {
+  font-size: 20rpx;
+  color: $color-text-tertiary;
+}
+
+.statBadge {
+  position: absolute;
+  top: 12rpx;
+  right: 12rpx;
+  min-width: 32rpx;
+  height: 32rpx;
+  padding: 0 8rpx;
+  background-color: $color-error;
+  color: $color-text-white;
+  font-size: 20rpx;
+  font-weight: $font-weight-semibold;
+  border-radius: $radius-round;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+// Tab切换
+.tabs {
+  display: flex;
+  background-color: $color-bg-card;
+  border-radius: $radius-lg;
+  padding: 8rpx;
+  margin-bottom: $spacing-lg;
+  box-shadow: $shadow-card;
+}
+
+.tabItem {
+  flex: 1;
+  padding: $spacing-md 0;
+  text-align: center;
+  font-size: $font-size-sm;
+  font-weight: $font-weight-medium;
+  color: $color-text-secondary;
+  border-radius: $radius-md;
+  transition: all $transition-fast;
+  position: relative;
+}
+
+.activeTab {
+  background: linear-gradient(135deg, $color-primary 0%, $color-primary-light 100%);
+  color: $color-text-white;
+  box-shadow: 0 2rpx 8rpx rgba(255, 140, 66, 0.3);
+}
+
+.tabBadge {
+  position: absolute;
+  top: 8rpx;
+  right: 20rpx;
+  min-width: 28rpx;
+  height: 28rpx;
+  padding: 0 6rpx;
+  background-color: $color-error;
+  color: $color-text-white;
+  font-size: 18rpx;
+  font-weight: $font-weight-semibold;
+  border-radius: $radius-round;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+// 消息列表
+.messageList {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-sm;
+  margin-bottom: $spacing-xl;
+}
+
+// 聊天会话列表
+.chatSection {
+  margin-bottom: $spacing-xl;
+}
+
+.sectionHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: $spacing-md;
+}
+
+.sectionTitle {
+  display: flex;
+  align-items: center;
+  gap: $spacing-sm;
+  font-size: $font-size-lg;
+  font-weight: $font-weight-semibold;
+  color: $color-text-primary;
+}
+
+.sectionCount {
+  font-size: $font-size-sm;
+  color: $color-text-tertiary;
+}
+
+.chatList {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-sm;
+}
+
+.chatItem {
+  display: flex;
+  align-items: center;
+  gap: $spacing-md;
+  background-color: $color-bg-card;
+  border-radius: $radius-lg;
+  padding: $spacing-lg;
+  box-shadow: 0 1rpx 4rpx rgba(0, 0, 0, 0.04);
+  transition: all $transition-base;
+
+  &:active {
+    transform: scale(0.995);
+    background-color: $color-bg-hover;
+  }
+}
+
+.chatAvatar {
+  width: 88rpx;
+  height: 88rpx;
+  border-radius: $radius-round;
+  background: linear-gradient(135deg, $color-primary 0%, $color-primary-light 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 40rpx;
+  flex-shrink: 0;
+  position: relative;
+}
+
+.chatAvatarSecondary {
+  background: linear-gradient(135deg, $color-secondary 0%, $color-secondary-light 100%);
+}
+
+.chatAvatarImg {
+  width: 100%;
+  height: 100%;
+  border-radius: $radius-round;
+}
+
+.chatOnline {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  width: 20rpx;
+  height: 20rpx;
+  background-color: $color-success;
+  border: 3rpx solid $color-bg-card;
+  border-radius: $radius-round;
+}
+
+.chatContent {
+  flex: 1;
+  min-width: 0;
+}
+
+.chatHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 8rpx;
+}
+
+.chatName {
+  font-size: $font-size-md;
+  font-weight: $font-weight-semibold;
+  color: $color-text-primary;
+}
+
+.chatTime {
+  font-size: $font-size-xs;
+  color: $color-text-tertiary;
+}
+
+.chatPreview {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.chatPreviewText {
+  font-size: $font-size-sm;
+  color: $color-text-secondary;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  flex: 1;
+  margin-right: $spacing-sm;
+}
+
+.chatBadge {
+  min-width: 32rpx;
+  height: 32rpx;
+  padding: 0 10rpx;
+  background-color: $color-error;
+  color: $color-text-white;
+  font-size: 22rpx;
+  font-weight: $font-weight-semibold;
+  border-radius: $radius-round;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+// 快捷操作
+.quickActions {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: $spacing-md;
+  margin-bottom: $spacing-xl;
+}
+
+.quickAction {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: $spacing-md 0;
+  background-color: $color-bg-card;
+  border-radius: $radius-lg;
+  box-shadow: 0 1rpx 4rpx rgba(0, 0, 0, 0.04);
+  transition: all $transition-base;
+
+  &:active {
+    transform: scale(0.96);
+    background-color: $color-bg-hover;
+  }
+}
+
+.quickActionIcon {
+  width: 64rpx;
+  height: 64rpx;
+  border-radius: $radius-md;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 32rpx;
+  margin-bottom: $spacing-sm;
+}
+
+.iconPrimary {
+  background-color: rgba(255, 140, 66, 0.12);
+}
+
+.iconSuccess {
+  background-color: rgba(124, 179, 66, 0.12);
+}
+
+.iconInfo {
+  background-color: rgba(66, 165, 245, 0.12);
+}
+
+.iconWarning {
+  background-color: rgba(255, 193, 7, 0.12);
+}
+
+.quickActionLabel {
+  font-size: $font-size-xs;
+  color: $color-text-secondary;
+}
+
+// 评价回访
+.reviewCard {
+  background-color: $color-bg-card;
+  border-radius: $radius-xl;
+  padding: $spacing-xl;
+  margin-bottom: $spacing-xl;
+  box-shadow: $shadow-card;
+  background-image: linear-gradient(135deg, rgba(255, 140, 66, 0.06) 0%, rgba(124, 179, 66, 0.06) 100%);
+}
+
+.reviewHeader {
+  display: flex;
+  align-items: center;
+  gap: $spacing-md;
+  margin-bottom: $spacing-lg;
+}
+
+.reviewAvatar {
+  width: 80rpx;
+  height: 80rpx;
+  border-radius: $radius-md;
+}
+
+.reviewInfo {
+  flex: 1;
+}
+
+.reviewTitle {
+  font-size: $font-size-lg;
+  font-weight: $font-weight-semibold;
+  color: $color-text-primary;
+  margin-bottom: 4rpx;
+}
+
+.reviewSubtitle {
+  font-size: $font-size-xs;
+  color: $color-text-tertiary;
+}
+
+.starsRow {
+  display: flex;
+  gap: 12rpx;
+  margin-bottom: $spacing-lg;
+}
+
+.star {
+  font-size: 40rpx;
+  color: $color-border;
+  transition: all $transition-fast;
+}
+
+.starActive {
+  color: #FFC107;
+}
+
+.reviewInput {
+  width: 100%;
+  height: 160rpx;
+  padding: $spacing-md;
+  background-color: $color-bg-page;
+  border-radius: $radius-md;
+  font-size: $font-size-sm;
+  color: $color-text-primary;
+  margin-bottom: $spacing-lg;
+  box-sizing: border-box;
+  line-height: $line-height-normal;
+}
+
+.reviewButtons {
+  display: flex;
+  gap: $spacing-md;
+}
+
+.reviewBtn {
+  @include button-reset;
+  flex: 1;
+  height: $button-height-md;
+  border-radius: $radius-button;
+  font-size: $font-size-sm;
+  font-weight: $font-weight-medium;
+  transition: all $transition-base;
+
+  &:active {
+    opacity: 0.9;
+    transform: scale(0.98);
+  }
+}
+
+.reviewBtnOutline {
+  background-color: $color-bg-hover;
+  color: $color-text-secondary;
+}
+
+.reviewBtnPrimary {
+  background: linear-gradient(135deg, $color-primary 0%, $color-primary-light 100%);
+  color: $color-text-white;
+}
